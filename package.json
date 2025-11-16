@@ -1,0 +1,56 @@
+{
+  "name": "@fimbul-works/runa",
+  "description": "Rúna is a collection of utilities to perform bidirectional transformations.",
+  "version": "0.1.0",
+  "type": "module",
+  "private": false,
+  "license": "MIT",
+  "author": "FimbulWorks <contact@fimbul.works>",
+  "homepage": "https://github.com/fimbul-works/runa#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fimbul-works/runa.git"
+  },
+  "bugs": {
+    "url": "https://github.com/fimbul-works/runa/issues"
+  },
+  "keywords": [],
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/esm/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/esm/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    },
+    "./aes-gcm": {
+      "types": "./dist/esm/aes-gcm.d.ts",
+      "import": "./dist/esm/aes-gcm.js",
+      "require": "./dist/cjs/aes-gcm.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "rm -rf dist && pnpm build:esm && pnpm build:cjs",
+    "build:esm": "tsc -p tsconfig.json",
+    "build:cjs": "tsc -p tsconfig.cjs.json && echo '{\"type\":\"commonjs\"}' > dist/cjs/package.json",
+    "format": "npx biome format --write src",
+    "test": "vitest",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.5",
+    "@types/node": "^24.10.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.9"
+  },
+  "dependencies": {
+    "ff1-js": "^1.0.2"
+  }
+}
