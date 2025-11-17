@@ -1,4 +1,4 @@
-import type { Runa } from "./types.js";
+import { createRuna } from "./runa.js";
 
 export const runaNumberCharset = (alphabet: string, minLength = 1) => {
   const base = alphabet.length;
@@ -19,13 +19,14 @@ export const runaNumberCharset = (alphabet: string, minLength = 1) => {
   }
 
   // Check that all characters are unique
-  const uniqueChars = new Set(alphabet);
+  const charset = alphabet.split("");
+  const uniqueChars = new Set(charset);
   if (uniqueChars.size !== base) {
     throw new Error("Alphabet must contain unique characters");
   }
 
-  return {
-    encode: (num: number) => {
+  return createRuna(
+    (num: number) => {
       if (typeof num !== "number") {
         throw new Error(`Expected number, got ${typeof num}`);
       }
@@ -49,22 +50,22 @@ export const runaNumberCharset = (alphabet: string, minLength = 1) => {
       let quotient = num;
 
       if (quotient === 0) {
-        result = alphabet[0];
+        result = charset[0];
       } else {
         do {
-          result = alphabet[quotient % base] + result;
+          result = charset[quotient % base] + result;
           quotient = Math.floor(quotient / base);
         } while (quotient > 0);
       }
 
       // Pad with leading characters to meet minimum length
       while (result.length < minLength) {
-        result = alphabet[0] + result;
+        result = charset[0] + result;
       }
 
       return result;
     },
-    decode: (str: string) => {
+    (str: string) => {
       if (typeof str !== "string") {
         throw new Error(`Expected string, got ${typeof str}`);
       }
@@ -76,7 +77,7 @@ export const runaNumberCharset = (alphabet: string, minLength = 1) => {
 
       for (let i = 0; i < str.length; i++) {
         const char = str[i];
-        const charIndex = alphabet.indexOf(char);
+        const charIndex = charset.indexOf(char);
 
         if (charIndex === -1) {
           throw new Error(`Invalid character '${char}' not found in alphabet`);
@@ -87,5 +88,5 @@ export const runaNumberCharset = (alphabet: string, minLength = 1) => {
 
       return result;
     },
-  } as Runa<number, string>;
+  );
 };

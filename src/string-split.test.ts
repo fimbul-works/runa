@@ -1,21 +1,21 @@
-import { describe, it, expect, beforeEach } from "vitest";
-import { runaSplit } from "./split.js";
+import { beforeEach, describe, expect, it } from "vitest";
+import { runaStringSplit } from "./string-split.js";
 
-describe("runaSplit", () => {
-  let splitByComma: ReturnType<typeof runaSplit>;
-  let splitBySpace: ReturnType<typeof runaSplit>;
-  let splitByNewline: ReturnType<typeof runaSplit>;
-  let splitByPipe: ReturnType<typeof runaSplit>;
-  let splitByEmptyString: ReturnType<typeof runaSplit>;
-  let splitBySpecialChar: ReturnType<typeof runaSplit>;
+describe("runaStringSplit", () => {
+  let splitByComma: ReturnType<typeof runaStringSplit>;
+  let splitBySpace: ReturnType<typeof runaStringSplit>;
+  let splitByNewline: ReturnType<typeof runaStringSplit>;
+  let splitByPipe: ReturnType<typeof runaStringSplit>;
+  let splitByEmptyString: ReturnType<typeof runaStringSplit>;
+  let splitBySpecialChar: ReturnType<typeof runaStringSplit>;
 
   beforeEach(() => {
-    splitByComma = runaSplit(",");
-    splitBySpace = runaSplit(" ");
-    splitByNewline = runaSplit("\n");
-    splitByPipe = runaSplit("|");
-    splitByEmptyString = runaSplit("");
-    splitBySpecialChar = runaSplit("😀");
+    splitByComma = runaStringSplit(",");
+    splitBySpace = runaStringSplit(" ");
+    splitByNewline = runaStringSplit("\n");
+    splitByPipe = runaStringSplit("|");
+    splitByEmptyString = runaStringSplit("");
+    splitBySpecialChar = runaStringSplit("😀");
   });
 
   describe("encode", () => {
@@ -131,14 +131,14 @@ describe("runaSplit", () => {
     });
 
     it("should handle complex multi-character delimiters", () => {
-      const splitByComplex = runaSplit("--");
+      const splitByComplex = runaStringSplit("--");
       expect(splitByComplex.encode("a--b--c")).toEqual(["a", "b", "c"]);
       expect(splitByComplex.encode("start--end")).toEqual(["start", "end"]);
       expect(splitByComplex.encode("no delimiter")).toEqual(["no delimiter"]);
     });
 
     it("should handle emoji and Unicode strings", () => {
-      const splitByDash = runaSplit("-");
+      const splitByDash = runaStringSplit("-");
       expect(splitByDash.encode("😀-😁-😂")).toEqual(["😀", "😁", "😂"]);
       expect(splitByDash.encode("测试-字符串")).toEqual(["测试", "字符串"]);
       expect(splitByDash.encode("café-münchen")).toEqual(["café", "münchen"]);
@@ -251,14 +251,14 @@ describe("runaSplit", () => {
     });
 
     it("should handle complex multi-character delimiters", () => {
-      const splitByComplex = runaSplit("--");
+      const splitByComplex = runaStringSplit("--");
       expect(splitByComplex.decode(["a", "b", "c"])).toBe("a--b--c");
       expect(splitByComplex.decode(["start", "end"])).toBe("start--end");
       expect(splitByComplex.decode(["no delimiter"])).toBe("no delimiter");
     });
 
     it("should handle emoji and Unicode arrays", () => {
-      const splitByDash = runaSplit("-");
+      const splitByDash = runaStringSplit("-");
       expect(splitByDash.decode(["😀", "😁", "😂"])).toBe("😀-😁-😂");
       expect(splitByDash.decode(["测试", "字符串"])).toBe("测试-字符串");
       expect(splitByDash.decode(["café", "münchen"])).toBe("café-münchen");
@@ -308,11 +308,11 @@ describe("runaSplit", () => {
       ];
 
       for (const original of testCases) {
-        const splitWithComma = runaSplit(",");
-        const splitWithSpace = runaSplit(" ");
-        const splitWithNewline = runaSplit("\n");
-        const splitWithPipe = runaSplit("|");
-        const splitWithDash = runaSplit("-");
+        const splitWithComma = runaStringSplit(",");
+        const splitWithSpace = runaStringSplit(" ");
+        const splitWithNewline = runaStringSplit("\n");
+        const splitWithPipe = runaStringSplit("|");
+        const splitWithDash = runaStringSplit("-");
 
         // Test with comma delimiter
         if (original.includes(",")) {
@@ -364,13 +364,13 @@ describe("runaSplit", () => {
       ];
 
       for (const original of edgeCases) {
-        const commaSplit = runaSplit(",");
-        const spaceSplit = runaSplit(" ");
-        const newlineSplit = runaSplit("\n");
-        const pipeSplit = runaSplit("|");
-        const dashSplit = runaSplit("-");
-        const doubleDashSplit = runaSplit("--");
-        const emptySplit = runaSplit("");
+        const commaSplit = runaStringSplit(",");
+        const spaceSplit = runaStringSplit(" ");
+        const newlineSplit = runaStringSplit("\n");
+        const pipeSplit = runaStringSplit("|");
+        const dashSplit = runaStringSplit("-");
+        const doubleDashSplit = runaStringSplit("--");
+        const emptySplit = runaStringSplit("");
 
         // Test all delimiters with edge cases
         const testCases = [
@@ -394,13 +394,13 @@ describe("runaSplit", () => {
 
   describe("delimiter edge cases", () => {
     it("should handle single character delimiters", () => {
-      const singleCharSplit = runaSplit("x");
+      const singleCharSplit = runaStringSplit("x");
       expect(singleCharSplit.encode("axbxcx")).toEqual(["a", "b", "c", ""]);
       expect(singleCharSplit.decode(["a", "b", "c"])).toBe("axbxc");
     });
 
     it("should handle multi-character delimiters", () => {
-      const multiCharSplit = runaSplit("DELIMITER");
+      const multiCharSplit = runaStringSplit("DELIMITER");
       expect(multiCharSplit.encode("aDELIMITERbDELIMITERc")).toEqual([
         "a",
         "b",
@@ -412,28 +412,28 @@ describe("runaSplit", () => {
     });
 
     it("should handle whitespace delimiters", () => {
-      const tabSplit = runaSplit("\t");
+      const tabSplit = runaStringSplit("\t");
       expect(tabSplit.encode("a\tb\tc")).toEqual(["a", "b", "c"]);
       expect(tabSplit.decode(["a", "b", "c"])).toBe("a\tb\tc");
 
-      const carriageReturnSplit = runaSplit("\r");
+      const carriageReturnSplit = runaStringSplit("\r");
       expect(carriageReturnSplit.encode("a\rb\rc")).toEqual(["a", "b", "c"]);
       expect(carriageReturnSplit.decode(["a", "b", "c"])).toBe("a\rb\rc");
     });
 
     it("should handle escape sequences as delimiters", () => {
-      const backslashSplit = runaSplit("\\");
+      const backslashSplit = runaStringSplit("\\");
       expect(backslashSplit.encode("a\\b\\c")).toEqual(["a", "b", "c"]);
       expect(backslashSplit.decode(["a", "b", "c"])).toBe("a\\b\\c");
 
-      const quoteSplit = runaSplit('"');
+      const quoteSplit = runaStringSplit('"');
       expect(quoteSplit.encode('a"b"c')).toEqual(["a", "b", "c"]);
       expect(quoteSplit.decode(["a", "b", "c"])).toBe('a"b"c');
     });
 
     it("should handle very long delimiters", () => {
       const longDelimiter = "VERY_LONG_DELIMITER";
-      const longSplit = runaSplit(longDelimiter);
+      const longSplit = runaStringSplit(longDelimiter);
       expect(
         longSplit.encode(`start${longDelimiter}middle${longDelimiter}end`),
       ).toEqual(["start", "middle", "end"]);
@@ -445,7 +445,7 @@ describe("runaSplit", () => {
 
   describe("performance and size considerations", () => {
     it("should handle very large strings", () => {
-      const largeString = "a,".repeat(10000) + "b";
+      const largeString = `${"a,".repeat(10000)}b`;
       const encoded = splitByComma.encode(largeString);
       expect(encoded).toHaveLength(10001);
       expect(encoded[0]).toBe("a");

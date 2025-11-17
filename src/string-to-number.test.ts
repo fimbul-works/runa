@@ -1,11 +1,11 @@
-import { describe, it, expect, beforeEach } from "vitest";
-import { runaNumber } from "./number.js";
+import { beforeEach, describe, expect, it } from "vitest";
+import { runaStringToNumber } from "./string-to-number.js";
 
-describe("runaNumber", () => {
-  let numberTransformer: ReturnType<typeof runaNumber>;
+describe("runaStringToNumber", () => {
+  let numberTransformer: ReturnType<typeof runaStringToNumber>;
 
   beforeEach(() => {
-    numberTransformer = runaNumber();
+    numberTransformer = runaStringToNumber();
   });
 
   it("should encode integer strings to numbers", () => {
@@ -77,8 +77,6 @@ describe("runaNumber", () => {
       { input: "1e5", expectedOutput: "100000" }, // Scientific notation becomes regular number
       { input: "1.5e-3", expectedOutput: "0.0015" },
       { input: "-2E10", expectedOutput: "-20000000000" },
-      { input: "Infinity", expectedOutput: "Infinity" },
-      { input: "-Infinity", expectedOutput: "-Infinity" },
     ];
 
     for (const { input, expectedOutput } of testCases) {
@@ -89,10 +87,18 @@ describe("runaNumber", () => {
   });
 
   it("should handle Infinity and -Infinity", () => {
-    expect(numberTransformer.encode("Infinity") as number).toBe(Infinity);
-    expect(numberTransformer.encode("-Infinity") as number).toBe(-Infinity);
-    expect(numberTransformer.decode(Infinity) as string).toBe("Infinity");
-    expect(numberTransformer.decode(-Infinity) as string).toBe("-Infinity");
+    expect(numberTransformer.encode("Infinity") as number).toBe(
+      Number.POSITIVE_INFINITY,
+    );
+    expect(numberTransformer.encode("-Infinity") as number).toBe(
+      Number.NEGATIVE_INFINITY,
+    );
+    expect(numberTransformer.decode(Number.POSITIVE_INFINITY) as string).toBe(
+      "Infinity",
+    );
+    expect(numberTransformer.decode(Number.NEGATIVE_INFINITY) as string).toBe(
+      "-Infinity",
+    );
   });
 
   it("should throw error for truly non-numeric strings", () => {

@@ -1,10 +1,9 @@
-import type { Runa } from "./types.js";
+import { createRuna } from "./runa.js";
 
-export const runaURI = () => {
-  return {
-    encode: (str: string) => encodeURIComponent(str),
-    decode: (str: string) => decodeURIComponent(str),
-  } as Runa<string, string>;
-};
+export const runaURI = () =>
+  createRuna(
+    (str: string) => encodeURIComponent(str),
+    (str: string) => decodeURIComponent(str),
+  );
 
 export default runaURI;

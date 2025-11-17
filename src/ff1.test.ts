@@ -11,20 +11,16 @@ describe("runaFF1", () => {
   let ff1Alphabetic: Awaited<ReturnType<typeof runaFF1>>;
   let ff1Custom: Awaited<ReturnType<typeof runaFF1>>;
 
-  beforeEach(async () => {
+  beforeEach(() => {
     // Use exactly 32-byte keys for AES-256
-    ff1Basic = await runaFF1(TEST_KEY, TEST_TWEAK);
-    ff1Numeric = await runaFF1(TEST_KEY, TEST_TWEAK, "0123456789");
-    ff1Alphabetic = await runaFF1(
-      TEST_KEY,
-      TEST_TWEAK,
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-    );
-    ff1Custom = await runaFF1(TEST_KEY, TEST_TWEAK, "!@#$%^&*()");
+    ff1Basic = runaFF1(TEST_KEY, TEST_TWEAK);
+    ff1Numeric = runaFF1(TEST_KEY, TEST_TWEAK, "0123456789");
+    ff1Alphabetic = runaFF1(TEST_KEY, TEST_TWEAK, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    ff1Custom = runaFF1(TEST_KEY, TEST_TWEAK, "!@#$%^&*()");
   });
 
   describe("basic functionality", () => {
-    it("should encrypt and decrypt simple strings", async () => {
+    it("should encrypt and decrypt simple strings", () => {
       const plaintext = "hello";
       const encrypted = ff1Basic.encode(plaintext);
       const decrypted = ff1Basic.decode(encrypted);
@@ -34,7 +30,7 @@ describe("runaFF1", () => {
       expect(decrypted).toBe(plaintext);
     });
 
-    it("should encrypt and decrypt numeric strings", async () => {
+    it("should encrypt and decrypt numeric strings", () => {
       const plaintext = "1234567890";
       const encrypted = ff1Numeric.encode(plaintext);
       const decrypted = ff1Numeric.decode(encrypted);
@@ -44,7 +40,7 @@ describe("runaFF1", () => {
       expect(decrypted).toBe(plaintext);
     });
 
-    it("should encrypt and decrypt alphabetic strings", async () => {
+    it("should encrypt and decrypt alphabetic strings", () => {
       const plaintext = "HELLOWORLD";
       const encrypted = ff1Alphabetic.encode(plaintext);
       const decrypted = ff1Alphabetic.decode(encrypted);
@@ -54,7 +50,7 @@ describe("runaFF1", () => {
       expect(decrypted).toBe(plaintext);
     });
 
-    it("should encrypt and decrypt with custom character sets", async () => {
+    it("should encrypt and decrypt with custom character sets", () => {
       const plaintext = "!@#$%";
       const encrypted = ff1Custom.encode(plaintext);
       const decrypted = ff1Custom.decode(encrypted);
@@ -64,7 +60,7 @@ describe("runaFF1", () => {
       expect(decrypted).toBe(plaintext);
     });
 
-    it("should handle empty strings", async () => {
+    it("should handle empty strings", () => {
       const plaintext = "";
       // FF1 requires minimum input length of 2, so empty strings should throw
       expect(() => ff1Basic.encode(plaintext)).toThrow();
@@ -132,8 +128,8 @@ describe("runaFF1", () => {
       const key1 = "test-key-12345678901234567890123";
       const key2 = "test-key-12345678901234567890124"; // last char different
 
-      const ff1Key1 = await runaFF1(key1, TEST_TWEAK, "0123456789");
-      const ff1Key2 = await runaFF1(key2, TEST_TWEAK, "0123456789");
+      const ff1Key1 = runaFF1(key1, TEST_TWEAK, "0123456789");
+      const ff1Key2 = runaFF1(key2, TEST_TWEAK, "0123456789");
 
       const encrypted1 = ff1Key1.encode(plaintext);
       const encrypted2 = ff1Key2.encode(plaintext);
@@ -153,8 +149,8 @@ describe("runaFF1", () => {
       const tweak1 = "tweak-123456789";
       const tweak2 = "tweak-123456788"; // last digit different
 
-      const ff1Tweak1 = await runaFF1(TEST_KEY, tweak1, "0123456789");
-      const ff1Tweak2 = await runaFF1(TEST_KEY, tweak2, "0123456789");
+      const ff1Tweak1 = runaFF1(TEST_KEY, tweak1, "0123456789");
+      const ff1Tweak2 = runaFF1(TEST_KEY, tweak2, "0123456789");
 
       const encrypted1 = ff1Tweak1.encode(plaintext);
       const encrypted2 = ff1Tweak2.encode(plaintext);
@@ -173,7 +169,7 @@ describe("runaFF1", () => {
       const keyBuffer = Buffer.from(TEST_KEY);
       const tweakBuffer = Buffer.from(TEST_TWEAK);
 
-      const ff1Buffer = await runaFF1(keyBuffer, tweakBuffer, "0123456789");
+      const ff1Buffer = runaFF1(keyBuffer, tweakBuffer, "0123456789");
 
       const plaintext = "123456";
       const encrypted = ff1Buffer.encode(plaintext);
@@ -185,13 +181,7 @@ describe("runaFF1", () => {
 
   describe("length constraints", () => {
     it("should respect minimum length constraint", async () => {
-      const ff1MinLength = await runaFF1(
-        TEST_KEY,
-        TEST_TWEAK,
-        "0123456789",
-        5,
-        10,
-      );
+      const ff1MinLength = runaFF1(TEST_KEY, TEST_TWEAK, "0123456789", 5, 10);
 
       const shortPlaintext = "123"; // length 3, below minimum of 5
       expect(() => ff1MinLength.encode(shortPlaintext)).toThrow();
@@ -206,7 +196,7 @@ describe("runaFF1", () => {
     });
 
     it("should respect maximum length constraint", async () => {
-      const ff1MaxLength = await runaFF1(
+      const ff1MaxLength = runaFF1(
         TEST_KEY,
         TEST_TWEAK,
         "0123456789",
@@ -269,7 +259,7 @@ describe("runaFF1", () => {
 
   describe("edge cases", () => {
     it("should handle strings with special characters", async () => {
-      const ff1Extended = await runaFF1(
+      const ff1Extended = runaFF1(
         TEST_KEY,
         TEST_TWEAK,
         "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
@@ -308,15 +298,15 @@ describe("runaFF1", () => {
 
   describe("error handling", () => {
     it("should handle empty key gracefully", async () => {
-      await expect(runaFF1("", "tweak", "0123456789")).rejects.toThrow();
+      expect(() => runaFF1("", "tweak", "0123456789")).toThrow();
     });
 
     it("should handle empty alphabet gracefully", async () => {
-      await expect(runaFF1("key", "tweak", "")).rejects.toThrow();
+      expect(() => runaFF1(TEST_KEY, TEST_TWEAK, "")).toThrow();
     });
 
     it("should handle single character alphabet", async () => {
-      await expect(runaFF1("key", "tweak", "A")).rejects.toThrow();
+      expect(() => runaFF1(TEST_KEY, TEST_TWEAK, "A")).toThrow();
     });
 
     it("should handle invalid characters in plaintext", async () => {

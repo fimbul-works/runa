@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { runaNumberCharset } from "./charset.js";
+import { runaNumberCharset } from "./number-charset.js";
 
 describe("runaNumberCharset", () => {
   let charset: ReturnType<typeof runaNumberCharset>;

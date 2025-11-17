@@ -1,15 +1,18 @@
-import type { Runa } from "./types.js";
+import { createRuna } from "./runa.js";
 
-export const runaCantorPair = () => {
-  return {
-    encode: (pair: [number, number]) => {
+export const runaCantorPair = () =>
+  createRuna(
+    (pair: number[]) => {
+      if (pair.length !== 2) {
+        throw new Error(`Invalid number pair: ${JSON.stringify(pair)}`);
+      }
       const [x, y] = pair;
       if (x < 0 || y < 0)
         throw new Error("Cantor pair requires non-negative integers");
       // Cantor pairing formula: π(x,y) = (x+y)(x+y+1)/2 + y
       return ((x + y) * (x + y + 1)) / 2 + y;
     },
-    decode: (z: number) => {
+    (z: number) => {
       if (typeof z !== "number" && typeof z !== "bigint") {
         throw new Error(`Unexpected type: ${typeof z}`);
       }
@@ -18,7 +21,6 @@ export const runaCantorPair = () => {
       const t = (w * w + w) / 2;
       const y = z - t;
       const x = w - y;
-      return [x, y] as [number, number];
+      return [x, y] as number[];
     },
-  } as Runa<[number, number], number>;
-};
+  );

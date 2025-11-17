@@ -1,8 +1,7 @@
-import type { Runa } from "./types.js";
+import { createRuna } from "./runa.js";
 
-export const runaJSON = <T>() => {
-  return {
-    encode: (str: T) => JSON.stringify(str),
-    decode: (json: string) => JSON.parse(json) as T,
-  } as Runa<T, string>;
-};
+export const runaJSON = <T>() =>
+  createRuna(
+    (str: T) => JSON.stringify(str),
+    (json: string) => JSON.parse(json) as T,
+  );

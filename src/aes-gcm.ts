@@ -1,35 +1,39 @@
 import { getCrypto } from "./crypto.js";
-import type { AsyncRuna, Uint8ArrayLike } from "./types.js";
+import { createRunaAsync } from "./runa.js";
+import type { RunaAsync, Uint8ArrayLike } from "./types.js";
 import { concatBuffers } from "./util.js";
 
 export const runaAesGcm = async (
-  keyMaterial: string | BufferSource,
+  key: string | BufferSource,
   salt?: BufferSource,
-): Promise<AsyncRuna<string, Uint8ArrayLike>> => {
+): Promise<RunaAsync<string, Uint8ArrayLike>> => {
   const crypto = await getCrypto();
-  const key = await crypto.deriveKey(keyMaterial, salt);
+  const derivedKey = await crypto.deriveKey(key, salt);
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
 
-  return {
-    encode: async (plaintext: string) => {
+  return createRunaAsync(
+    async (plaintext: string) => {
       const iv = crypto.randomBytes(12);
       const encoded = encoder.encode(plaintext);
-      const ciphertext = new Uint8Array(
-        await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, encoded),
+      const ciphertext = await crypto.subtle.encrypt(
+        { name: "AES-GCM", iv },
+        derivedKey,
+        encoded,
       );
       // Return IV + ciphertext combined
-      return concatBuffers(iv, ciphertext);
+      return concatBuffers(iv, new Uint8Array(ciphertext));
     },
-    decode: async (encoded: Uint8Array) => {
+    async (encoded: Uint8Array) => {
+      // Extract IV + ciphertext
       const iv = encoded.slice(0, 12);
       const ciphertext = encoded.slice(12);
       const plaintext = await crypto.subtle.decrypt(
         { name: "AES-GCM", iv },
-        key,
+        derivedKey,
         ciphertext,
       );
       return decoder.decode(plaintext);
     },
-  } as AsyncRuna<string, Uint8ArrayLike>;
+  );
 };

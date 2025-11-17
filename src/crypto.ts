@@ -1,8 +1,5 @@
-import { Alphabets, type FF1, createFF1 } from "ff1-js";
-
 export interface CryptoAdapter {
   subtle: SubtleCrypto;
-  ff1: typeof createFF1;
   randomBytes: (size: number) => Uint8Array<ArrayBuffer>;
   deriveKey: (
     keyMaterial: string | BufferSource,
@@ -16,24 +13,15 @@ let cryptoAdapter: CryptoAdapter | null = null;
 export async function getCrypto(): Promise<CryptoAdapter> {
   if (cryptoAdapter) return cryptoAdapter;
 
-  const ff1 = (
-    key: string | Buffer,
-    tweak: string | Buffer,
-    alphabet?: string,
-    minLength?: number,
-    maxLength?: number,
-  ) => createFF1(key, tweak, alphabet, minLength, maxLength);
-
   if (typeof window !== "undefined" && window.crypto) {
     // Browser: use Web Crypto API directly
     const subtle = window.crypto.subtle;
     cryptoAdapter = {
       subtle,
-      ff1,
       randomBytes: (size: number) =>
         window.crypto.getRandomValues(new Uint8Array(size)),
       deriveKey: async (
-        keyMaterial: string | BufferSource,
+        baseKey: string | BufferSource,
         salt?: BufferSource,
       ) => {
         const encoder = new TextEncoder();
@@ -44,9 +32,9 @@ export async function getCrypto(): Promise<CryptoAdapter> {
 
         // Convert keyMaterial to Uint8Array
         const keyBytes =
-          typeof keyMaterial === "string"
-            ? encoder.encode(keyMaterial)
-            : new Uint8Array(keyMaterial as ArrayBuffer);
+          typeof baseKey === "string"
+            ? encoder.encode(baseKey)
+            : new Uint8Array(baseKey as ArrayBuffer);
 
         // Import key material
         const importedKey = await subtle.importKey(
@@ -78,11 +66,10 @@ export async function getCrypto(): Promise<CryptoAdapter> {
     const subtle = webcrypto.subtle as SubtleCrypto;
     cryptoAdapter = {
       subtle,
-      ff1,
       randomBytes: (size: number) =>
         webcrypto.getRandomValues(new Uint8Array(size)),
       deriveKey: async (
-        keyMaterial: string | BufferSource,
+        baseKey: string | BufferSource,
         salt?: BufferSource,
       ) => {
         const encoder = new TextEncoder();
@@ -93,9 +80,9 @@ export async function getCrypto(): Promise<CryptoAdapter> {
 
         // Convert keyMaterial to Uint8Array
         const keyBytes =
-          typeof keyMaterial === "string"
-            ? encoder.encode(keyMaterial)
-            : new Uint8Array(keyMaterial as ArrayBuffer);
+          typeof baseKey === "string"
+            ? encoder.encode(baseKey)
+            : new Uint8Array(baseKey as ArrayBuffer);
 
         // Import key material
         const importedKey = await subtle.importKey(
