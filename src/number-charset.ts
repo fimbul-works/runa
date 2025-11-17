@@ -1,4 +1,5 @@
 import { createRuna } from "./runa.js";
+import { serializeValue } from "./util.js";
 
 /**
  * Creates a bidirectional number-to-string transformation using custom character sets.
@@ -120,7 +121,7 @@ export const runaNumberCharset = (alphabet: string, minLength = 1) => {
   return createRuna(
     (num: number) => {
       if (typeof num !== "number") {
-        throw new Error(`Expected number, got ${typeof num}`);
+        throw new Error(`Invalid number: ${serializeValue(num)}`);
       }
       if (num < 0) {
         throw new Error("Cannot encode negative numbers");
@@ -159,7 +160,7 @@ export const runaNumberCharset = (alphabet: string, minLength = 1) => {
     },
     (str: string) => {
       if (typeof str !== "string") {
-        throw new Error(`Expected string, got ${typeof str}`);
+        throw new Error(`Invalid string: ${serializeValue(str)}`);
       }
       if (str.length === 0) {
         throw new Error("Cannot decode empty string");
@@ -172,7 +173,9 @@ export const runaNumberCharset = (alphabet: string, minLength = 1) => {
         const charIndex = charset.indexOf(char);
 
         if (charIndex === -1) {
-          throw new Error(`Invalid character '${char}' not found in alphabet`);
+          throw new Error(
+            `Invalid character \"${char}\" not found in alphabet`,
+          );
         }
 
         result = result * base + charIndex;

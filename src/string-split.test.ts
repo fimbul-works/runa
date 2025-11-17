@@ -155,7 +155,7 @@ describe("runaStringSplit", () => {
         "Invalid string: undefined",
       );
       expect(() => splitByComma.encode({} as unknown as string)).toThrow(
-        "Invalid string: [object Object]",
+        "Invalid string: {}",
       );
       expect(() => splitByComma.encode([] as unknown as string)).toThrow(
         "Invalid string: ",
@@ -267,7 +267,7 @@ describe("runaStringSplit", () => {
     it("should throw error for non-array inputs", () => {
       expect(() =>
         splitByComma.decode("string" as unknown as string[]),
-      ).toThrow("Invalid array: string");
+      ).toThrow('Invalid array: "string"');
       expect(() => splitByComma.decode(123 as unknown as string[])).toThrow(
         "Invalid array: 123",
       );
@@ -278,7 +278,7 @@ describe("runaStringSplit", () => {
         splitByComma.decode(undefined as unknown as string[]),
       ).toThrow("Invalid array: undefined");
       expect(() => splitByComma.decode({} as unknown as string[])).toThrow(
-        "Invalid array: [object Object]",
+        "Invalid array: {}",
       );
     });
 

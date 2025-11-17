@@ -1,4 +1,5 @@
 import { createRuna } from "./runa.js";
+import { serializeValue } from "./util.js";
 
 /**
  * Creates a bidirectional array flattening transformation.
@@ -130,17 +131,21 @@ export const runaFlatten = <T>(chunkSize: number) => {
   return createRuna(
     (arr: Array<Array<T>>) => {
       if (!Array.isArray(arr)) {
-        throw new Error(`Invalid array: ${arr}`);
+        throw new Error(`Invalid array: ${serializeValue(arr)}`);
       }
 
       // Validate that all chunks respect the expected size
       for (let i = 0; i < arr.length; i++) {
         const chunk = arr[i];
         if (!Array.isArray(chunk)) {
-          throw new Error(`Invalid chunk at index ${i}: ${JSON.stringify(chunk)}`);
+          throw new Error(
+            `Invalid chunk at index ${i}: ${serializeValue(chunk)}`,
+          );
         }
         if (chunk.length > chunkSize) {
-          throw new Error(`Chunk size ${chunk.length} exceeds expected ${chunkSize} at index ${i}`);
+          throw new Error(
+            `Chunk size ${chunk.length} exceeds expected ${chunkSize} at index ${i}`,
+          );
         }
       }
 
@@ -148,7 +153,7 @@ export const runaFlatten = <T>(chunkSize: number) => {
     },
     (flat: Array<T>) => {
       if (!Array.isArray(flat)) {
-        throw new Error(`Invalid array: ${flat}`);
+        throw new Error(`Invalid array: ${serializeValue(flat)}`);
       }
 
       // Re-chunk the flattened array
@@ -157,6 +162,6 @@ export const runaFlatten = <T>(chunkSize: number) => {
         result.push(flat.slice(i, i + chunkSize));
       }
       return result;
-    }
+    },
   );
 };

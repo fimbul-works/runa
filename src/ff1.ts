@@ -1,5 +1,6 @@
 import { createFF1 } from "ff1-js";
 import { createRuna } from "./runa.js";
+import { serializeValue } from "./util.js";
 
 /**
  * Creates a bidirectional FF1 (Format-Preserving Encryption) transformation.
@@ -151,14 +152,14 @@ export const runaFF1 = (
 
   return createRuna(
     (plaintext: string) => {
-      if (plaintext === null || plaintext === undefined) {
-        throw new Error("Input cannot be null or undefined");
+      if (typeof plaintext !== "string") {
+        throw new Error(`Invalid string: ${serializeValue(plaintext)}`);
       }
       return ff1.encrypt(plaintext);
     },
     (encoded: string) => {
-      if (encoded === null || encoded === undefined) {
-        throw new Error("Input cannot be null or undefined");
+      if (typeof encoded !== "string") {
+        throw new Error(`Invalid string: ${serializeValue(encoded)}`);
       }
       return ff1.decrypt(encoded);
     },

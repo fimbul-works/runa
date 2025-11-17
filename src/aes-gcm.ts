@@ -1,7 +1,7 @@
 import { getCrypto } from "./crypto.js";
 import { createRunaAsync } from "./runa.js";
 import type { RunaAsync, Uint8ArrayLike } from "./types.js";
-import { concatBuffers } from "./util.js";
+import { concatBuffers, serializeValue } from "./util.js";
 
 /**
  * Creates a bidirectional AES-GCM encryption transformation.
@@ -97,6 +97,9 @@ export const runaAesGcm = async (
 
   return createRunaAsync(
     async (plaintext: string) => {
+      if (typeof plaintext !== "string") {
+        throw new Error(`Invalid string: ${serializeValue(plaintext)}`);
+      }
       const iv = crypto.randomBytes(12);
       const encoded = encoder.encode(plaintext);
       const ciphertext = await crypto.subtle.encrypt(
@@ -108,6 +111,9 @@ export const runaAesGcm = async (
       return concatBuffers(iv, new Uint8Array(ciphertext));
     },
     async (encoded: Uint8Array) => {
+      if (!(encoded instanceof Uint8Array)) {
+        throw new Error(`Invalid Uint8Array: ${serializeValue(encoded)}`);
+      }
       // Extract IV + ciphertext
       const iv = encoded.slice(0, 12);
       const ciphertext = encoded.slice(12);

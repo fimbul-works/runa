@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { runaNumberToChar } from "./number-to-char.js";
+import { serializeValue } from "./util.js";
 
 describe("runaNumberToChar", () => {
   let charTransformer: ReturnType<typeof runaNumberToChar>;
@@ -31,7 +32,9 @@ describe("runaNumberToChar", () => {
       const expectedChars = "abcdefghijklmnopqrstuvwxyz".split("");
 
       lowerCodes.forEach((code, index) => {
-        expect(charTransformer.encode(code) as string).toBe(expectedChars[index]);
+        expect(charTransformer.encode(code) as string).toBe(
+          expectedChars[index],
+        );
       });
     });
 
@@ -40,7 +43,9 @@ describe("runaNumberToChar", () => {
       const expectedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
       upperCodes.forEach((code, index) => {
-        expect(charTransformer.encode(code) as string).toBe(expectedChars[index]);
+        expect(charTransformer.encode(code) as string).toBe(
+          expectedChars[index],
+        );
       });
     });
 
@@ -49,7 +54,9 @@ describe("runaNumberToChar", () => {
       const expectedChars = "0123456789".split("");
 
       digitCodes.forEach((code, index) => {
-        expect(charTransformer.encode(code) as string).toBe(expectedChars[index]);
+        expect(charTransformer.encode(code) as string).toBe(
+          expectedChars[index],
+        );
       });
     });
 
@@ -58,7 +65,9 @@ describe("runaNumberToChar", () => {
       const expectedChars = ["\x80", "©", "®", "°", "¹", "¿", "È", "é", "ÿ"];
 
       extendedCodes.forEach((code, index) => {
-        expect(charTransformer.encode(code) as string).toBe(expectedChars[index]);
+        expect(charTransformer.encode(code) as string).toBe(
+          expectedChars[index],
+        );
       });
     });
 
@@ -115,21 +124,23 @@ describe("runaNumberToChar", () => {
 
       for (const input of invalidInputs) {
         expect(() => charTransformer.encode(input as any) as string).toThrow(
-          `Invalid character code: ${input}`,
+          `Invalid character code: ${serializeValue(input)}`,
         );
       }
 
       // Symbol needs special handling since it can't be converted to string
-      expect(() => charTransformer.encode(Symbol("test") as any) as string).toThrow();
+      expect(
+        () => charTransformer.encode(Symbol("test") as any) as string,
+      ).toThrow();
     });
 
     it("should handle special number values", () => {
-      expect(() => charTransformer.encode(Number.POSITIVE_INFINITY) as string).toThrow(
-        "Character code out of range 0-255: Infinity",
-      );
-      expect(() => charTransformer.encode(Number.NEGATIVE_INFINITY) as string).toThrow(
-        "Character code out of range 0-255: -Infinity",
-      );
+      expect(
+        () => charTransformer.encode(Number.POSITIVE_INFINITY) as string,
+      ).toThrow("Character code out of range 0-255: Infinity");
+      expect(
+        () => charTransformer.encode(Number.NEGATIVE_INFINITY) as string,
+      ).toThrow("Character code out of range 0-255: -Infinity");
 
       // NaN is special: it passes range checks (NaN <= 0 is false, NaN > 255 is false)
       // and String.fromCharCode(NaN) returns null character
@@ -160,7 +171,9 @@ describe("runaNumberToChar", () => {
       const expectedCodes = Array.from({ length: 26 }, (_, i) => i + 97); // 97-122
 
       lowerChars.forEach((char, index) => {
-        expect(charTransformer.decode(char) as number).toBe(expectedCodes[index]);
+        expect(charTransformer.decode(char) as number).toBe(
+          expectedCodes[index],
+        );
       });
     });
 
@@ -169,7 +182,9 @@ describe("runaNumberToChar", () => {
       const expectedCodes = Array.from({ length: 26 }, (_, i) => i + 65); // 65-90
 
       upperChars.forEach((char, index) => {
-        expect(charTransformer.decode(char) as number).toBe(expectedCodes[index]);
+        expect(charTransformer.decode(char) as number).toBe(
+          expectedCodes[index],
+        );
       });
     });
 
@@ -178,14 +193,43 @@ describe("runaNumberToChar", () => {
       const expectedCodes = Array.from({ length: 10 }, (_, i) => i + 48); // 48-57
 
       digitChars.forEach((char, index) => {
-        expect(charTransformer.decode(char) as number).toBe(expectedCodes[index]);
+        expect(charTransformer.decode(char) as number).toBe(
+          expectedCodes[index],
+        );
       });
     });
 
     it("should decode special characters and symbols", () => {
       const specialChars = [
-        " ", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "+", "-",
-        "=", "[", "]", "{", "}", ";", "'", ":", "\"", ",", ".", "<", ">", "/", "?",
+        " ",
+        "!",
+        "@",
+        "#",
+        "$",
+        "%",
+        "^",
+        "&",
+        "*",
+        "(",
+        ")",
+        "_",
+        "+",
+        "-",
+        "=",
+        "[",
+        "]",
+        "{",
+        "}",
+        ";",
+        "'",
+        ":",
+        '"',
+        ",",
+        ".",
+        "<",
+        ">",
+        "/",
+        "?",
       ];
 
       for (const char of specialChars) {
@@ -239,11 +283,13 @@ describe("runaNumberToChar", () => {
 
       // Numbers are converted to strings and treated as characters
       expect(() => charTransformer.decode(65 as any) as number).toThrow(
-        'Invalid character: 65',
+        "Invalid character: 65",
       );
 
       // BigInt needs special handling due to JSON.stringify issues
-      expect(() => charTransformer.decode(BigInt(65) as any) as number).toThrow();
+      expect(
+        () => charTransformer.decode(BigInt(65) as any) as number,
+      ).toThrow();
     });
   });
 
@@ -353,7 +399,7 @@ describe("runaNumberToChar", () => {
         "Character code out of range 0-255: 300",
       );
       expect(() => charTransformer.encode("65" as any) as string).toThrow(
-        "Invalid character code: 65",
+        'Invalid character code: "65"',
       );
 
       // 3.14 actually gets encoded successfully (String.fromCharCode truncates to int)
@@ -368,7 +414,7 @@ describe("runaNumberToChar", () => {
         'Invalid character: "ab"',
       );
       expect(() => charTransformer.decode(65 as any) as number).toThrow(
-        'Invalid character: 65',
+        "Invalid character: 65",
       );
     });
   });
@@ -437,7 +483,9 @@ describe("runaNumberToChar", () => {
       const startTime = Date.now();
 
       // Encode all characters
-      const chars = largeArray.map((code) => charTransformer.encode(code) as string);
+      const chars = largeArray.map(
+        (code) => charTransformer.encode(code) as string,
+      );
 
       // Decode all characters
       const codes = chars.map((char) => charTransformer.decode(char) as number);

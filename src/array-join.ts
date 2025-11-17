@@ -1,4 +1,5 @@
 import { createRuna } from "./runa.js";
+import { serializeValue } from "./util.js";
 
 /**
  * Creates a bidirectional array to string transformation using number joining/splitting.
@@ -165,20 +166,20 @@ export const runaArrayJoin = (separator = "") => {
   return createRuna(
     (arr: number[]) => {
       if (!Array.isArray(arr)) {
-        throw new Error(`Invalid array: ${arr}`);
+        throw new Error(`Invalid array: ${serializeValue(arr)}`);
       }
       return arr.join(separator);
     },
     (str: string) => {
       if (typeof str !== "string") {
-        throw new Error(`Invalid string: ${str}`);
+        throw new Error(`Invalid string: ${serializeValue(str)}`);
       }
       if (separator === "") {
         // For empty separator, treat each character as a digit
         return str.split("").map((char) => {
           const num = Number.parseInt(char, 10);
           if (Number.isNaN(num)) {
-            throw new Error(`Invalid digit character: ${char}`);
+            throw new Error(`Invalid digit character: ${serializeValue(char)}`);
           }
           return num;
         });
@@ -186,7 +187,7 @@ export const runaArrayJoin = (separator = "") => {
       return str.split(separator).map((part) => {
         const num = Number.parseFloat(part);
         if (Number.isNaN(num)) {
-          throw new Error(`Invalid number part: ${part}`);
+          throw new Error(`Invalid number part: ${serializeValue(part)}`);
         }
         return num;
       });

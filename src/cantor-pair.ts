@@ -1,4 +1,5 @@
 import { createRuna } from "./runa.js";
+import { serializeValue } from "./util.js";
 
 /**
  * Creates a bidirectional Cantor pairing transformation.
@@ -124,7 +125,7 @@ export const runaCantorPair = () =>
   createRuna(
     (pair: number[]) => {
       if (pair.length !== 2) {
-        throw new Error(`Invalid number pair: ${JSON.stringify(pair)}`);
+        throw new Error(`Invalid number pair: ${serializeValue(pair)}`);
       }
       const [x, y] = pair;
       if (x < 0 || y < 0)
@@ -134,7 +135,7 @@ export const runaCantorPair = () =>
     },
     (z: number) => {
       if (typeof z !== "number" && typeof z !== "bigint") {
-        throw new Error(`Unexpected type: ${typeof z}`);
+        throw new Error(`Invalid number: ${serializeValue(z)}`);
       }
       // Inverse Cantor pairing formula
       const w = Math.floor((Math.sqrt(8 * z + 1) - 1) / 2);

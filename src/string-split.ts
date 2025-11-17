@@ -1,4 +1,5 @@
 import { createRuna } from "./runa.js";
+import { serializeValue } from "./util.js";
 
 /**
  * Creates a bidirectional string splitting transformation.
@@ -47,13 +48,13 @@ export const runaStringSplit = (delimiter: string) =>
   createRuna(
     (str: string) => {
       if (typeof str !== "string") {
-        throw new Error(`Invalid string: ${str}`);
+        throw new Error(`Invalid string: ${serializeValue(str)}`);
       }
       return str.split(delimiter);
     },
     (arr: string[]) => {
       if (!Array.isArray(arr)) {
-        throw new Error(`Invalid array: ${arr}`);
+        throw new Error(`Invalid array: ${serializeValue(arr)}`);
       }
       return arr.join(delimiter);
     },

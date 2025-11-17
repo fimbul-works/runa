@@ -1,5 +1,6 @@
 import { runaNumberCharset } from "./number-charset.js";
 import { createRuna } from "./runa.js";
+import { serializeValue } from "./util.js";
 
 /**
  * Creates a bidirectional number array to string transformation using custom character sets.
@@ -102,7 +103,7 @@ export const runaNumberArrayCharset = (alphabet: string, minLength = 1) => {
   return createRuna(
     (numbers: number[]) => {
       if (!Array.isArray(numbers)) {
-        throw new Error(`Invalid array: ${numbers}`);
+        throw new Error(`Invalid array: ${serializeValue(numbers)}`);
       }
       // Join with a separator that's not in the alphabet
       const separator = "|";
@@ -110,7 +111,7 @@ export const runaNumberArrayCharset = (alphabet: string, minLength = 1) => {
     },
     (str: string) => {
       if (typeof str !== "string") {
-        throw new Error(`Invalid string: ${str}`);
+        throw new Error(`Invalid string: ${serializeValue(str)}`);
       }
 
       const separator = "|";

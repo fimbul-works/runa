@@ -1,4 +1,5 @@
 import { createRuna } from "./runa.js";
+import { serializeValue } from "./util.js";
 
 // Node.js compatible base64 implementation
 const encodeBase64 = (str: string): string => {
@@ -89,11 +90,8 @@ const decodeBase64 = (b64: string): string => {
 export const runaBase64 = () => {
   return createRuna(
     (str: string) => {
-      if (str === null || str === undefined) {
-        throw new Error("Input cannot be null or undefined");
-      }
       if (typeof str !== "string") {
-        throw new Error(`Expected string, got ${typeof str}`);
+        throw new Error(`Invalid string: ${serializeValue(str)}`);
       }
       try {
         return encodeBase64(str);
@@ -104,11 +102,8 @@ export const runaBase64 = () => {
       }
     },
     (b64: string) => {
-      if (b64 === null || b64 === undefined) {
-        throw new Error("Input cannot be null or undefined");
-      }
       if (typeof b64 !== "string") {
-        throw new Error(`Expected string, got ${typeof b64}`);
+        throw new Error(`Invalid string: ${serializeValue(b64)}`);
       }
       try {
         return decodeBase64(b64);

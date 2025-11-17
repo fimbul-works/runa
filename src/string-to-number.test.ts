@@ -115,13 +115,13 @@ describe("runaStringToNumber", () => {
 
     for (const invalid of invalidInputs) {
       expect(() => numberTransformer.encode(invalid) as number).toThrow(
-        `Not a number: ${invalid}`,
+        `Not a number: "${invalid}"`,
       );
     }
 
     // Special case - "NaN" string is also considered invalid
     expect(() => numberTransformer.encode("NaN") as number).toThrow(
-      "Not a number: NaN",
+      'Not a number: "NaN"',
     );
   });
 

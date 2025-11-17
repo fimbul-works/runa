@@ -5,10 +5,10 @@ import { runaBufferToArray } from "./buffer-to-array.js";
 import { runaCantorPairArray } from "./cantor-pair-array.js";
 import { runaFF1 } from "./ff1.js";
 import { runaNumberArrayCharset } from "./number-array-charset.js";
-import { runaStringSeparator } from "./string-clean.js";
+import { createRuna } from "./runa.js";
+import { runaStringPadStart } from "./string-pad.js";
 import { runaStringToBuffer } from "./string-to-buffer.js";
 import runaStringToNumber from "./string-to-number.js";
-import { createRuna } from "./runa.js";
 import type { RunaAsync, RunaSync } from "./types.js";
 
 describe("Transformation Chain Tests", () => {
@@ -17,7 +17,8 @@ describe("Transformation Chain Tests", () => {
   let arrSplit: RunaSync<number[], number[][]>;
   let cantorPairArray: RunaSync<number[][], number[]>;
   let numToCharset: RunaSync<number[], string>;
-  let stringSeparator: RunaSync<string, string>;
+  let padStart: RunaSync<string, string>;
+  let numberToSring: RunaSync<number, string>;
 
   beforeEach(() => {
     // Initialize all transformation utilities
@@ -29,7 +30,8 @@ describe("Transformation Chain Tests", () => {
       "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
       1,
     );
-    stringSeparator = runaStringSeparator();
+    padStart = runaStringPadStart(11, "0");
+    numberToSring = runaStringToNumber().reversed();
   });
 
   describe("Basic Transformation Chain", () => {
@@ -108,36 +110,6 @@ describe("Transformation Chain Tests", () => {
     });
   });
 
-  describe("String Cleaning", () => {
-    it("should remove and restore separators", () => {
-      const stringWithSeparators = "d6y|ghU|cQK|g6q|gC9|cuq";
-      // Use runaStringSeparator for perfect reversibility in transformation chains
-      // Note: runaStringSeparator uses encoding markers for perfect reversibility
-      const encodedString = stringSeparator.encode(stringWithSeparators);
-      const restoredString = stringSeparator.decode(encodedString);
-
-      // The encoded string contains markers for separator positions
-      expect(encodedString).toContain("d6y");
-      expect(encodedString).toContain("ghU");
-      expect(encodedString).toContain("cQK");
-      expect(encodedString).toContain("g6q");
-      expect(encodedString).toContain("gC9");
-      expect(encodedString).toContain("cuq");
-      // Should not contain the original separator directly (except in markers)
-      expect(encodedString).toMatch(/__SEP_3g__/g);
-
-      // Perfect reversibility - the restored string matches the original
-      expect(restoredString).toBe(stringWithSeparators);
-    });
-
-    it("should handle empty strings", () => {
-      const empty = "";
-      const cleaned = stringSeparator.encode(empty);
-      const restored = stringSeparator.decode(cleaned);
-      expect(restored).toBe(empty);
-    });
-  });
-
   describe("Async Chain with AES-GCM", () => {
     it("should encrypt and decrypt through async chain", async () => {
       const str = "Hello world!";
@@ -149,7 +121,6 @@ describe("Transformation Chain Tests", () => {
         .chain(arrSplit)
         .chain(cantorPairArray)
         .chain(numToCharset)
-        .chain(stringSeparator)
         .chainAsync(aesGcm);
 
       const encryptedBuffer = await asyncChain.encode(str);
@@ -169,7 +140,6 @@ describe("Transformation Chain Tests", () => {
         .chain(arrSplit)
         .chain(cantorPairArray)
         .chain(numToCharset)
-        .chain(stringSeparator)
         .chainAsync(aesGcm);
 
       // Multiple rounds
@@ -186,20 +156,23 @@ describe("Transformation Chain Tests", () => {
   describe("YouTube-style ID Generation with FF1", () => {
     it("should generate YouTube-style IDs from numbers", async () => {
       // Use FF1 with YouTube-style alphabet
-      const ff1 = await runaFF1(
+      const ff1 = runaFF1(
         "youtube-key-12345678901234567890",
         "youtube-tweak-123",
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-",
+        11,
       );
 
       // Test number to ID conversion
       const testNumber = 123456789;
-      const youtubeId = ff1.encode(testNumber.toString());
-      const decodedNumber = ff1.decode(youtubeId);
+
+      const idChain = numberToSring.chain(padStart).chain(ff1);
+      const youtubeId = idChain.encode(testNumber);
+      const decodedNumber = idChain.decode(youtubeId);
 
       expect(youtubeId).toBeTypeOf("string");
-      expect(youtubeId.length).toBe(testNumber.toString().length); // Format preserving
-      expect(decodedNumber).toBe(testNumber.toString());
+      expect(youtubeId.length).toBe(11); // Format preserving
+      expect(decodedNumber).toBe(testNumber);
     });
 
     it("should work with sequential numbers", async () => {
@@ -236,7 +209,7 @@ describe("Transformation Chain Tests", () => {
       // Create a simple number to string transformer for FF1
       const numberToString = createRuna(
         (num: number) => num.toString(),
-        (str: string) => parseInt(str, 10)
+        (str: string) => Number.parseInt(str, 10),
       );
 
       // Build the chain: number -> string -> FF1 YouTube ID

@@ -13,6 +13,20 @@ let cryptoAdapter: CryptoAdapter | null = null;
 export async function getCrypto(): Promise<CryptoAdapter> {
   if (cryptoAdapter) return cryptoAdapter;
 
+  const encoder = new TextEncoder();
+
+  // Default salt if not provided
+  const createKeySalt = (salt?: BufferSource) =>
+    salt
+      ? new Uint8Array(salt as ArrayBuffer)
+      : new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0]);
+
+  // Convert key to Uint8Array
+  const createKeyBytes = (key: string | BufferSource) =>
+    typeof key === "string"
+      ? encoder.encode(key)
+      : new Uint8Array(key as ArrayBuffer);
+
   if (typeof window !== "undefined" && window.crypto) {
     // Browser: use Web Crypto API directly
     const subtle = window.crypto.subtle;
@@ -21,20 +35,12 @@ export async function getCrypto(): Promise<CryptoAdapter> {
       randomBytes: (size: number) =>
         window.crypto.getRandomValues(new Uint8Array(size)),
       deriveKey: async (
-        baseKey: string | BufferSource,
+        key: string | BufferSource,
         salt?: BufferSource,
+        iterations = 100000,
       ) => {
-        const encoder = new TextEncoder();
-        // Default salt if not provided
-        const keySalt = salt
-          ? new Uint8Array(salt as ArrayBuffer)
-          : new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0]);
-
-        // Convert keyMaterial to Uint8Array
-        const keyBytes =
-          typeof baseKey === "string"
-            ? encoder.encode(baseKey)
-            : new Uint8Array(baseKey as ArrayBuffer);
+        const keySalt = createKeySalt(salt);
+        const keyBytes = createKeyBytes(key);
 
         // Import key material
         const importedKey = await subtle.importKey(
@@ -50,7 +56,7 @@ export async function getCrypto(): Promise<CryptoAdapter> {
           {
             name: "PBKDF2",
             salt: keySalt,
-            iterations: 100000,
+            iterations,
             hash: "SHA-256",
           },
           importedKey,
@@ -69,20 +75,12 @@ export async function getCrypto(): Promise<CryptoAdapter> {
       randomBytes: (size: number) =>
         webcrypto.getRandomValues(new Uint8Array(size)),
       deriveKey: async (
-        baseKey: string | BufferSource,
+        key: string | BufferSource,
         salt?: BufferSource,
+        iterations = 100000,
       ) => {
-        const encoder = new TextEncoder();
-        // Default salt if not provided
-        const keySalt = salt
-          ? new Uint8Array(salt as ArrayBuffer)
-          : new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0]);
-
-        // Convert keyMaterial to Uint8Array
-        const keyBytes =
-          typeof baseKey === "string"
-            ? encoder.encode(baseKey)
-            : new Uint8Array(baseKey as ArrayBuffer);
+        const keySalt = createKeySalt(salt);
+        const keyBytes = createKeyBytes(key);
 
         // Import key material
         const importedKey = await subtle.importKey(
@@ -98,7 +96,7 @@ export async function getCrypto(): Promise<CryptoAdapter> {
           {
             name: "PBKDF2",
             salt: keySalt,
-            iterations: 100000,
+            iterations,
             hash: "SHA-256",
           },
           importedKey,

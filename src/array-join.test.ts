@@ -103,11 +103,15 @@ describe("runaArrayJoin", () => {
       });
 
       it("should throw on undefined input for encode", () => {
-        expect(() => arrayJoin.encode(undefined as any)).toThrow("Invalid array");
+        expect(() => arrayJoin.encode(undefined as any)).toThrow(
+          "Invalid array",
+        );
       });
 
       it("should throw on non-array input for encode", () => {
-        expect(() => arrayJoin.encode("not an array" as any)).toThrow("Invalid array");
+        expect(() => arrayJoin.encode("not an array" as any)).toThrow(
+          "Invalid array",
+        );
         expect(() => arrayJoin.encode(123 as any)).toThrow("Invalid array");
         expect(() => arrayJoin.encode({} as any)).toThrow("Invalid array");
       });
@@ -117,7 +121,9 @@ describe("runaArrayJoin", () => {
       });
 
       it("should throw on undefined input for decode", () => {
-        expect(() => arrayJoin.decode(undefined as any)).toThrow("Invalid string");
+        expect(() => arrayJoin.decode(undefined as any)).toThrow(
+          "Invalid string",
+        );
       });
 
       it("should throw on non-string input for decode", () => {
@@ -127,10 +133,18 @@ describe("runaArrayJoin", () => {
       });
 
       it("should throw on non-digit characters", () => {
-        expect(() => arrayJoin.decode("12a45")).toThrow("Invalid digit character: a");
-        expect(() => arrayJoin.decode("12.45")).toThrow("Invalid digit character: .");
-        expect(() => arrayJoin.decode("12-45")).toThrow("Invalid digit character: -");
-        expect(() => arrayJoin.decode("abc")).toThrow("Invalid digit character: a");
+        expect(() => arrayJoin.decode("12a45")).toThrow(
+          'Invalid digit character: "a"',
+        );
+        expect(() => arrayJoin.decode("12.45")).toThrow(
+          'Invalid digit character: "."',
+        );
+        expect(() => arrayJoin.decode("12-45")).toThrow(
+          'Invalid digit character: "-"',
+        );
+        expect(() => arrayJoin.decode("abc")).toThrow(
+          'Invalid digit character: "a"',
+        );
       });
 
       it("should handle decimal points in joined output but not in input", () => {
@@ -139,7 +153,9 @@ describe("runaArrayJoin", () => {
         expect(result).toBe("1.52.7");
 
         // This will throw when trying to decode because of the decimal point
-        expect(() => arrayJoin.decode(result)).toThrow("Invalid digit character: .");
+        expect(() => arrayJoin.decode(result)).toThrow(
+          'Invalid digit character: "."',
+        );
       });
     });
   });
@@ -248,21 +264,31 @@ describe("runaArrayJoin", () => {
 
     describe("Error handling with custom separator", () => {
       it("should throw on invalid number parts", () => {
-        expect(() => arrayJoin.decode("1,2,abc,4")).toThrow("Invalid number part: abc");
-        expect(() => arrayJoin.decode("1,2,,4")).toThrow("Invalid number part: ");
+        expect(() => arrayJoin.decode("1,2,abc,4")).toThrow(
+          'Invalid number part: "abc"',
+        );
+        expect(() => arrayJoin.decode("1,2,,4")).toThrow(
+          "Invalid number part: ",
+        );
         expect(() => arrayJoin.decode("1.2.3,4")).not.toThrow(); // Valid float
       });
 
       it("should handle trailing separators", () => {
-        expect(() => arrayJoin.decode("1,2,3,")).toThrow("Invalid number part: ");
+        expect(() => arrayJoin.decode("1,2,3,")).toThrow(
+          "Invalid number part: ",
+        );
       });
 
       it("should handle leading separators", () => {
-        expect(() => arrayJoin.decode(",1,2,3")).toThrow("Invalid number part: ");
+        expect(() => arrayJoin.decode(",1,2,3")).toThrow(
+          "Invalid number part: ",
+        );
       });
 
       it("should handle consecutive separators", () => {
-        expect(() => arrayJoin.decode("1,,2,,3")).toThrow("Invalid number part: ");
+        expect(() => arrayJoin.decode("1,,2,,3")).toThrow(
+          "Invalid number part: ",
+        );
       });
     });
   });
@@ -273,7 +299,9 @@ describe("runaArrayJoin", () => {
       const commaJoin = runaArrayJoin(",");
 
       // Empty separator uses parseInt (integer only)
-      expect(() => emptyJoin.decode("12.5")).toThrow("Invalid digit character: .");
+      expect(() => emptyJoin.decode("12.5")).toThrow(
+        'Invalid digit character: "."',
+      );
 
       // Custom separator uses parseFloat (allows decimals)
       const commaResult = commaJoin.decode("12.5");
@@ -319,7 +347,9 @@ describe("runaArrayJoin", () => {
       expect(decoded).toEqual(original);
 
       // NaN handling limitation - parseFloat("NaN") returns NaN, but implementation throws on NaN
-      expect(() => arrayJoin.decode("Infinity,-Infinity,NaN")).toThrow("Invalid number part: NaN");
+      expect(() => arrayJoin.decode("Infinity,-Infinity,NaN")).toThrow(
+        'Invalid number part: "NaN"',
+      );
     });
 
     it("should handle repeated encode/decode operations", () => {

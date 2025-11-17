@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getCrypto, type CryptoAdapter } from "./crypto.js";
+import { type CryptoAdapter, getCrypto } from "./crypto.js";
 
 // Mock Web Crypto API for testing
 const mockSubtleCrypto = {
@@ -84,7 +84,7 @@ describe("crypto", () => {
         expect.any(Uint8Array),
         { name: "PBKDF2" },
         false,
-        ["deriveKey"]
+        ["deriveKey"],
       );
 
       expect(mockSubtleCrypto.deriveKey).toHaveBeenCalledWith(
@@ -97,7 +97,7 @@ describe("crypto", () => {
         expect.any(Object),
         { name: "AES-GCM", length: 256 },
         false,
-        ["encrypt", "decrypt"]
+        ["encrypt", "decrypt"],
       );
     });
 
@@ -149,7 +149,7 @@ describe("crypto", () => {
         expect.any(Uint8Array),
         { name: "PBKDF2" },
         false,
-        ["deriveKey"]
+        ["deriveKey"],
       );
     });
 
@@ -324,7 +324,9 @@ describe("crypto", () => {
       } as any;
 
       const cryptoAdapter = await getCrypto();
-      mockSubtleCrypto.importKey.mockRejectedValue(new Error("Invalid key material"));
+      mockSubtleCrypto.importKey.mockRejectedValue(
+        new Error("Invalid key material"),
+      );
 
       try {
         await cryptoAdapter.deriveKey("");
@@ -411,12 +413,12 @@ describe("crypto", () => {
 
       // Test multiple random bytes requests
       const promises = Array.from({ length: 10 }, () =>
-        cryptoAdapter.randomBytes(32)
+        cryptoAdapter.randomBytes(32),
       );
 
       const results = await Promise.all(promises);
       expect(results).toHaveLength(10);
-      results.forEach(bytes => {
+      results.forEach((bytes) => {
         expect(bytes).toBeInstanceOf(Uint8Array);
         expect(bytes.length).toBe(32);
       });

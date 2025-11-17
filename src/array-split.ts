@@ -1,4 +1,5 @@
 import { createRuna } from "./runa.js";
+import { serializeValue } from "./util.js";
 
 /**
  * Creates a bidirectional array chunking transformation.
@@ -82,7 +83,7 @@ export const runaArraySplit = <T>(chunkSize = 1) => {
   return createRuna(
     (arr: Array<T>) => {
       if (!Array.isArray(arr)) {
-        throw new Error(`Invalid array: ${arr}`);
+        throw new Error(`Invalid array: ${serializeValue(arr)}`);
       }
       const chunks = Math.ceil(arr.length / chunkSize);
       const output: Array<Array<T>> = [];
@@ -93,16 +94,16 @@ export const runaArraySplit = <T>(chunkSize = 1) => {
     },
     (arr: Array<Array<T>>) => {
       if (!Array.isArray(arr)) {
-        throw new Error(`Invalid array: ${arr}`);
+        throw new Error(`Invalid array: ${serializeValue(arr)}`);
       }
       let output: Array<T> = [];
       for (let i = 0; i < arr.length; i++) {
         if (!Array.isArray(arr[i])) {
-          throw new Error(`Invalid array: ${JSON.stringify(arr[i])}`);
+          throw new Error(`Invalid array: ${serializeValue(arr[i])}`);
         }
         if (arr[i].length > chunkSize) {
           throw new Error(
-            `Array length exceeds chunkSize: ${JSON.stringify(arr[i])}`,
+            `Array length exceeds chunkSize: ${serializeValue(arr[i])}`,
           );
         }
         output = output.concat(arr[i]);

@@ -1,4 +1,5 @@
 import { createRuna } from "./runa.js";
+import { serializeValue } from "./util.js";
 
 /**
  * Creates a bidirectional string-to-number transformation.
@@ -75,13 +76,13 @@ export const runaStringToNumber = (radix?: number) => {
           ? Number.parseInt(str, radix)
           : Number.parseFloat(str);
       if (Number.isNaN(n)) {
-        throw new Error(`Not a number: ${str}`);
+        throw new Error(`Not a number: ${serializeValue(str)}`);
       }
       return n;
     },
     (num: number) => {
       if (typeof num !== "number") {
-        throw new Error(`Not a number: ${num}`);
+        throw new Error(`Not a number: ${serializeValue(num)}`);
       }
       return num.toString(radix);
     },

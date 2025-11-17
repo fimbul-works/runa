@@ -1,5 +1,6 @@
 import { runaCantorPair } from "./cantor-pair.js";
 import { createRuna } from "./runa.js";
+import { serializeValue } from "./util.js";
 
 /**
  * Creates a bidirectional Cantor pairing transformation for arrays of coordinate pairs.
@@ -141,27 +142,31 @@ export const runaCantorPairArray = () => {
   return createRuna(
     (pairs: number[][]) => {
       if (!Array.isArray(pairs)) {
-        throw new Error(`Invalid array: ${pairs}`);
+        throw new Error(`Invalid array: ${serializeValue(pairs)}`);
       }
 
       return pairs.map((pair, index) => {
         if (!Array.isArray(pair)) {
-          throw new Error(`Invalid pair at index ${index}: ${JSON.stringify(pair)}`);
+          throw new Error(
+            `Invalid pair at index ${index}: ${serializeValue(pair)}`,
+          );
         }
         return cantorPair.encode(pair);
       });
     },
     (numbers: number[]) => {
       if (!Array.isArray(numbers)) {
-        throw new Error(`Invalid array: ${numbers}`);
+        throw new Error(`Invalid array: ${serializeValue(numbers)}`);
       }
 
       return numbers.map((num, index) => {
-        if (typeof num !== 'number') {
-          throw new Error(`Invalid number at index ${index}: ${JSON.stringify(num)}`);
+        if (typeof num !== "number") {
+          throw new Error(
+            `Invalid number at index ${index}: ${serializeValue(num)}`,
+          );
         }
         return cantorPair.decode(num);
       });
-    }
+    },
   );
 };
