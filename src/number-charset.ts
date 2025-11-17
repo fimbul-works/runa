@@ -1,5 +1,97 @@
 import { createRuna } from "./runa.js";
 
+/**
+ * Creates a bidirectional number-to-string transformation using custom character sets.
+ *
+ * This utility converts between numbers and strings using a custom alphabet (character set),
+ * similar to how number systems work but with any set of characters. Perfect for creating
+ * compact ID systems, YouTube-style IDs, base64-like encodings, or any custom number
+ * representation system.
+ *
+ * The function validates that the alphabet contains unique ASCII characters and provides
+ * comprehensive error handling for edge cases. Supports padding to minimum lengths and
+ * handles large integers up to MAX_SAFE_INTEGER.
+ *
+ * @param alphabet - String of unique characters to use as the digit set (must contain at least 2 unique ASCII characters)
+ * @param minLength - Minimum length of encoded output (default: 1). Pads with first character if needed.
+ * @returns A RunaSync<number, string> instance that provides bidirectional number/string conversion using the custom alphabet
+ * @throws {Error} When alphabet validation fails, numbers are negative/non-finite/too large, or strings contain invalid characters
+ *
+ * @example
+ * // Create base62 encoding (0-9, a-z, A-Z)
+ * const base62 = runaNumberCharset("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+ *
+ * const num = 12345;
+ * const encoded = base62.encode(num); // "3d7"
+ * const decoded = base62.decode(encoded); // 12345
+ *
+ * @example
+ * // Create YouTube-style ID encoding
+ * const youtubeAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
+ * const youtubeEncoder = runaNumberCharset(youtubeAlphabet, 8); // Minimum 8 characters
+ *
+ * const userId = 987654321;
+ * const youtubeId = youtubeEncoder.encode(userId);
+ * // "AAAAAABQ" (padded to 8 characters)
+ *
+ * const originalId = youtubeEncoder.decode(youtubeId);
+ * // 987654321
+ *
+ * @example
+ * // Create binary encoding
+ * const binary = runaNumberCharset("01", 8); // 8-bit binary strings
+ *
+ * const byte = 42;
+ * const binaryStr = binary.encode(byte); // "00101010" (padded to 8 bits)
+ * const backToByte = binary.decode(binaryStr); // 42
+ *
+ * @example
+ * // Create hexadecimal encoding
+ * const hex = runaNumberCharset("0123456789ABCDEF");
+ *
+ * const colorValue = 255;
+ * const hexColor = hex.encode(colorValue); // "FF"
+ * const backToDecimal = hex.decode(hexColor); // 255
+ *
+ * @example
+ * // Create base36 encoding for compact IDs
+ * const base36 = runaNumberCharset("0123456789abcdefghijklmnopqrstuvwxyz");
+ *
+ * const largeNumber = 1234567890;
+ * const compactId = base36.encode(largeNumber); // "kf12oi"
+ * const restoredNumber = base36.decode(compactId); // 1234567890
+ *
+ * // Handle sequential IDs
+ * for (let i = 1; i <= 5; i++) {
+ *   const id = base36.encode(i);
+ *   console.log(`User ${i} -> ID ${id}`); // 1, 2, 3, 4, 5
+ * }
+ *
+ * @example
+ * // Error handling
+ * try {
+ *   // Invalid alphabet (duplicate characters)
+ *   runaNumberCharset("01234567890");
+ * } catch (error) {
+ *   console.log(error.message); // "Alphabet must contain unique characters"
+ * }
+ *
+ * try {
+ *   // Invalid character in decode
+ *   const encoder = runaNumberCharset("01");
+ *   encoder.decode("102"); // Contains '2' which is not in alphabet
+ * } catch (error) {
+ *   console.log(error.message); // "Invalid character '2' not found in alphabet"
+ * }
+ *
+ * try {
+ *   // Number too large
+ *   const encoder = runaNumberCharset("01");
+ *   encoder.encode(Number.MAX_SAFE_INTEGER + 1);
+ * } catch (error) {
+ *   console.log(error.message); // "Cannot encode numbers larger than Number.MAX_SAFE_INTEGER"
+ * }
+ */
 export const runaNumberCharset = (alphabet: string, minLength = 1) => {
   const base = alphabet.length;
   if (base < 2) {

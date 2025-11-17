@@ -58,6 +58,34 @@ const decodeBase64 = (b64: string): string => {
   }
 };
 
+/**
+ * Creates a bidirectional Base64 transformation for strings.
+ *
+ * This utility converts between plain text and Base64 encoding with full cross-platform
+ * compatibility. It works in both Node.js and browser environments, handling Unicode
+ * characters correctly and providing comprehensive error handling for invalid inputs.
+ *
+ * The transformation uses Buffer.from() in Node.js for optimal performance and
+ * falls back to btoa()/atob() in browsers with proper Unicode handling.
+ *
+ * @returns A RunaSync<string, string> instance that provides bidirectional Base64 encoding/decoding
+ *
+ * @example
+ * const base64 = runaBase64();
+ *
+ * // Encode plain text to Base64
+ * const encoded = base64.encode("Hello, 世界!"); // "SGVsbG8sIOS4lueVjCE="
+ *
+ * // Decode Base64 back to plain text
+ * const decoded = base64.decode("SGVsbG8sIOS4lueVjCE="); // "Hello, 世界!"
+ *
+ * // Handle invalid Base64 strings gracefully
+ * try {
+ *   base64.decode("invalid-base64!");
+ * } catch (error) {
+ *   console.log(error.message); // "Base64 decoding failed: Invalid base64 string format"
+ * }
+ */
 export const runaBase64 = () => {
   return createRuna(
     (str: string) => {

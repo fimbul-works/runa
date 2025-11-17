@@ -137,28 +137,42 @@ describe("runaStringClean", () => {
 
   describe("Error handling", () => {
     it("should throw on null input", () => {
-      expect(() => stringClean.encode(null as any)).toThrow("Input cannot be null or undefined");
+      expect(() => stringClean.encode(null as any)).toThrow(
+        "Input cannot be null or undefined",
+      );
     });
 
     it("should throw on undefined input", () => {
-      expect(() => stringClean.encode(undefined as any)).toThrow("Input cannot be null or undefined");
+      expect(() => stringClean.encode(undefined as any)).toThrow(
+        "Input cannot be null or undefined",
+      );
     });
 
     it("should throw on non-string input", () => {
-      expect(() => stringClean.encode(123 as any)).toThrow("Expected string, got number");
-      expect(() => stringClean.encode({} as any)).toThrow("Expected string, got object");
+      expect(() => stringClean.encode(123 as any)).toThrow(
+        "Expected string, got number",
+      );
+      expect(() => stringClean.encode({} as any)).toThrow(
+        "Expected string, got object",
+      );
     });
 
     it("should throw on null input for decode", () => {
-      expect(() => stringClean.decode(null as any)).toThrow("Input cannot be null or undefined");
+      expect(() => stringClean.decode(null as any)).toThrow(
+        "Input cannot be null or undefined",
+      );
     });
 
     it("should throw on undefined input for decode", () => {
-      expect(() => stringClean.decode(undefined as any)).toThrow("Input cannot be null or undefined");
+      expect(() => stringClean.decode(undefined as any)).toThrow(
+        "Input cannot be null or undefined",
+      );
     });
 
     it("should throw on non-string input for decode", () => {
-      expect(() => stringClean.decode(123 as any)).toThrow("Expected string, got number");
+      expect(() => stringClean.decode(123 as any)).toThrow(
+        "Expected string, got number",
+      );
     });
   });
 
@@ -261,24 +275,36 @@ describe("runaStringSeparator", () => {
 
   describe("Error handling", () => {
     it("should throw on null input for encode", () => {
-      expect(() => stringSeparator.encode(null as any)).toThrow("Input cannot be null or undefined");
+      expect(() => stringSeparator.encode(null as any)).toThrow(
+        "Input cannot be null or undefined",
+      );
     });
 
     it("should throw on undefined input for encode", () => {
-      expect(() => stringSeparator.encode(undefined as any)).toThrow("Input cannot be null or undefined");
+      expect(() => stringSeparator.encode(undefined as any)).toThrow(
+        "Input cannot be null or undefined",
+      );
     });
 
     it("should throw on null input for decode", () => {
-      expect(() => stringSeparator.decode(null as any)).toThrow("Input cannot be null or undefined");
+      expect(() => stringSeparator.decode(null as any)).toThrow(
+        "Input cannot be null or undefined",
+      );
     });
 
     it("should throw on undefined input for decode", () => {
-      expect(() => stringSeparator.decode(undefined as any)).toThrow("Input cannot be null or undefined");
+      expect(() => stringSeparator.decode(undefined as any)).toThrow(
+        "Input cannot be null or undefined",
+      );
     });
 
     it("should throw on non-string inputs", () => {
-      expect(() => stringSeparator.encode(123 as any)).toThrow("Expected string, got number");
-      expect(() => stringSeparator.decode([] as any)).toThrow("Expected string, got object");
+      expect(() => stringSeparator.encode(123 as any)).toThrow(
+        "Expected string, got number",
+      );
+      expect(() => stringSeparator.decode([] as any)).toThrow(
+        "Expected string, got object",
+      );
     });
 
     it("should throw on malformed encoded strings", () => {
@@ -315,7 +341,7 @@ describe("runaStringSeparator", () => {
     });
 
     it("should handle very long strings", () => {
-      const original = "a".repeat(1000) + "|" + "b".repeat(1000) + "|" + "c".repeat(1000);
+      const original = `${"a".repeat(1000)}|${"b".repeat(1000)}|${"c".repeat(1000)}`;
       const encoded = stringSeparator.encode(original);
       const decoded = stringSeparator.decode(encoded);
       expect(decoded).toBe(original);
