@@ -1,9 +1,9 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { runaAesGcm } from "./aes-gcm.js";
-import type { AsyncRuna, Uint8ArrayLike } from "./types.js";
+import type { RunaAsync, Uint8ArrayLike } from "./types.js";
 
 describe("runaAesGcm", () => {
-  let aesGcm: AsyncRuna<string, Uint8ArrayLike>;
+  let aesGcm: RunaAsync<string, Uint8ArrayLike>;
 
   beforeEach(async () => {
     // Use a test passphrase and salt
@@ -189,7 +189,7 @@ describe("runaAesGcm", () => {
         "A".repeat(1000),
         "Special chars: !@#$%^&*()",
         "Unicode: 😀🎉 测试",
-        "JSON: " + JSON.stringify({ test: true }),
+        `JSON: ${JSON.stringify({ test: true })}`,
         "Newlines\nand\r\nlines",
         "Tabs\tand\tspaces",
         "Mixed: Hello\nWorld\t!@#",

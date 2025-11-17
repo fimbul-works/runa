@@ -39,10 +39,15 @@ describe("runaBase64", () => {
     expect(base64.decode(encoded) as string).toBe(input);
   });
 
-  it("should fail on unicode characters with btoa/atob", () => {
-    // Note: btoa/atob only handle ASCII characters, not Unicode
+  it("should handle unicode characters correctly", () => {
+    // The updated implementation handles Unicode properly
     const input = "测试中文 🎉 Тест العربية";
-    expect(() => base64.encode(input) as string).toThrow();
+    const encoded = base64.encode(input) as string;
+    const decoded = base64.decode(encoded) as string;
+
+    expect(decoded).toBe(input);
+    expect(typeof encoded).toBe("string");
+    expect(encoded.length).toBeGreaterThan(0);
   });
 
   it("should be bidirectional - encode then decode returns original", () => {

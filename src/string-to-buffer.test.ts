@@ -1,11 +1,11 @@
-import { describe, it, expect, beforeEach } from "vitest";
-import { runaBuffer } from "./buffer.js";
+import { beforeEach, describe, expect, it } from "vitest";
+import { runaStringToBuffer } from "./string-to-buffer.js";
 
-describe("runaBuffer", () => {
-  let bufferTransformer: ReturnType<typeof runaBuffer>;
+describe("runaStringToBuffer", () => {
+  let bufferTransformer: ReturnType<typeof runaStringToBuffer>;
 
   beforeEach(() => {
-    bufferTransformer = runaBuffer();
+    bufferTransformer = runaStringToBuffer();
   });
 
   it("should encode simple strings to Uint8Array", () => {
@@ -31,7 +31,6 @@ describe("runaBuffer", () => {
   it("should be bidirectional - encode then decode returns original", () => {
     const testStrings = [
       "Hello, World!",
-      "",
       "1234567890",
       "Special chars: !@#$%^&*()",
       "Unicode: 🚀 🌟 💫",
@@ -46,17 +45,14 @@ describe("runaBuffer", () => {
       const decoded = bufferTransformer.decode(encoded) as string;
       expect(decoded).toBe(original);
     }
+
+    // Empty strings should throw as they indicate data loss
+    expect(() => bufferTransformer.encode("")).toThrow("String cannot be empty");
   });
 
   it("should handle empty string", () => {
-    const input = "";
-    const encoded = bufferTransformer.encode(input) as Uint8Array;
-
-    expect(encoded).toBeInstanceOf(Uint8Array);
-    expect(encoded.length).toBe(0);
-
-    const decoded = bufferTransformer.decode(encoded) as string;
-    expect(decoded).toBe("");
+    // Empty strings should throw as they indicate data loss
+    expect(() => bufferTransformer.encode("")).toThrow("String cannot be empty");
   });
 
   it("should handle Unicode characters correctly", () => {
@@ -117,7 +113,7 @@ describe("runaBuffer", () => {
   });
 
   it("should handle very long strings", () => {
-    const input = "A".repeat(10000) + " 🚀 " + "B".repeat(10000);
+    const input = `${"A".repeat(10000)} 🚀 ${"B".repeat(10000)}`;
     const encoded = bufferTransformer.encode(input) as Uint8Array;
     const decoded = bufferTransformer.decode(encoded) as string;
     expect(decoded).toBe(input);
@@ -229,11 +225,10 @@ describe("runaBuffer", () => {
       ).toThrow();
     }
 
-    // undefined has special behavior - it doesn't throw but returns empty string
-    const result = bufferTransformer.decode(
-      undefined as unknown as Uint8Array,
-    ) as string;
-    expect(result).toBe("");
+    // undefined should also throw as it indicates data loss
+    expect(() =>
+      bufferTransformer.decode(undefined as unknown as Uint8Array),
+    ).toThrow();
 
     // Symbol should also throw
     expect(() =>
@@ -243,8 +238,8 @@ describe("runaBuffer", () => {
 
   it("should handle empty buffers correctly", () => {
     const emptyBuffer = new Uint8Array(0);
-    const decoded = bufferTransformer.decode(emptyBuffer) as string;
-    expect(decoded).toBe("");
+    // Empty buffers should throw as they indicate data loss
+    expect(() => bufferTransformer.decode(emptyBuffer)).toThrow("Buffer cannot be empty");
   });
 
   it("should work with TextEncoder/TextDecoder options", () => {

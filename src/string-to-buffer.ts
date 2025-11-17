@@ -4,7 +4,17 @@ export const runaStringToBuffer = () => {
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
   return createRuna(
-    (str: string) => encoder.encode(str),
-    (buffer: Uint8Array) => decoder.decode(buffer),
+    (str: string) => {
+      if (str === null || str === undefined || str.length === 0) {
+        throw new Error("String cannot be empty");
+      }
+      return encoder.encode(str) as Uint8Array<ArrayBufferLike>;
+    },
+    (buffer: Uint8Array<ArrayBufferLike>) => {
+      if (buffer === null || buffer === undefined || buffer.length === 0) {
+        throw new Error("Buffer cannot be empty");
+      }
+      return decoder.decode(buffer);
+    },
   );
 };
