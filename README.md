@@ -2,11 +2,9 @@
 
 # @fimbul-works/runa
 
-> Bidirectional, type-safe transformations for TypeScript.
+*Runa (ᚱᚢᚾᚨ)* is a TypeScript library for creating elegant, bidirectional, and type-safe data transformations.
 
-_Runa (ᚱᚢᚾᚨ)_ is a TypeScript library for creating elegant, bidirectional, and type-safe data transformations. Inspired by the Old Norse word for __"secret"__ or __"rune"__, Runa provides the tools to translate data from one form to another and back again, with confidence.
-
-At its core, a __Runa__ is a composable object with two fundamental methods: `encode` and `decode`. This design ensures that your data transformations are always reversible and perfectly type-safe, whether you're working with synchronous or asynchronous operations.
+At its core, a **Runa** is a composable object with two fundamental methods: `encode` and `decode`. This design ensures that your data transformations are always reversible and perfectly type-safe, whether you're working with synchronous or asynchronous operations.
 
 ## Key Features
 
@@ -41,9 +39,9 @@ hex.encode(255) // "ff"
 hex.decode("ff") // 255
 ```
 
-## Advanced Example: String to Buffer to Array
+## Chaining: String to Buffer to Array
 
-One of the powerful features of Runa is the ability to chain multiple transformations. Here's an example that converts a string to a buffer, and then converts the buffer to an array:
+One of the features of Runa is the ability to chain multiple transformations. Here's an example that converts a string to a buffer, and then converts the buffer to an array:
 
 ```typescript
 import { createRuna } from '@fimbul-works/runa';
@@ -72,7 +70,7 @@ console.log(array); // [72, 101, 108, 108, 111, 44, 32, 82, 117, 110, 97, 33]
 console.log(reconstructedString); // "Hello, Runa!"
 ```
 
-This example demonstrates how *Runa* enables you to build complex transformation pipelines while maintaining type safety and bidirectional transformations at each step.
+This example demonstrates how Runa enables you to build complex transformation pipelines while maintaining type safety and bidirectional transformations at each step.
 
 ### More Examples
 
@@ -104,7 +102,7 @@ Converts between TypeScript objects and JSON strings with enhanced capabilities.
 Encodes and decodes URI components using `encodeURIComponent` and `decodeURIComponent`.
 
 #### `runaStringSplit(delimiter: string)` → `RunaSync<string, string[]>`
-Splits strings into arrays and rejoins them with a specified delimiter. Perfect for CSV-style data.
+Splits strings into arrays and rejoins them with a specified delimiter.
 
 #### `runaStringToNumber(radix?: number)` → `RunaSync<string, number>`
 Converts strings to numbers and back using specified radix (base).
@@ -113,26 +111,26 @@ Converts strings to numbers and back using specified radix (base).
 Converts UTF-8 strings to Uint8Array buffers and back.
 
 #### `runaStringPadStart(maxLength: number, fillString: string)` → `RunaSync<string, string>`
-Adds padding to the beginning of strings to reach a specified maximum length. Perfect for ID formatting, zero-padding numbers, or creating fixed-width displays. Handles multi-character fill strings and Unicode characters.
+Adds padding to the beginning of strings to reach a specified maximum length. Handles multi-character fill strings and Unicode characters.
 
 #### `runaStringPadEnd(maxLength: number, fillString: string)` → `RunaSync<string, string>`
-Adds padding to the end of strings to reach a specified maximum length. Ideal for right-aligning text, formatting data for display, or creating trailing padding. Handles multi-character fill strings and Unicode characters.
+Adds padding to the end of strings to reach a specified maximum length. Handles multi-character fill strings and Unicode characters.
 
 ### Arithmetic Operations
 
 #### `runaAdd(additive: number)` → `RunaSync<number, number>`
-Adds a constant value during encoding and subtracts it during decoding. Perfect for applying offsets, coordinate transformations, data normalization, or any scenario requiring reversible numeric adjustments.
+Adds a constant value during encoding and subtracts it during decoding.
 
 #### `runaMultiply(multiplier: number)` → `RunaSync<number, number>`
-Multiplies by a constant value during encoding and divides by the same value during decoding. Ideal for unit conversions, scaling coordinates, currency conversions, or applying multiplicative transformations. Throws error if multiplier is zero.
+Multiplies by a constant value during encoding and divides by the same value during decoding. Throws error if multiplier is zero.
 
 #### `runaPower(exponent: number)` → `RunaSync<number, number>`
-Raises to a power during encoding and takes the corresponding root during decoding. Perfect for square/cube transformations, geometric calculations, area/volume conversions, or scientific calculations. Handles negative values with odd exponents and throws error for invalid combinations.
+Raises to a power during encoding and takes the corresponding root during decoding. Handles negative values with odd exponents and throws error for invalid combinations.
 
 ### Number & Array Processing
 
 #### `runaNumberCharset(alphabet: string, minLength = 1)` → `RunaSync<number, string>`
-Converts numbers to strings using a custom character set (alphabet) and back. Perfect for creating custom ID systems.
+Converts numbers to strings using a custom character set (alphabet) and back.
 
 #### `runaNumberArrayCharset(alphabet: string, minLength = 1)` → `RunaSync<number[], string>`
 Converts arrays of numbers to strings using a custom character set and back.
@@ -141,7 +139,7 @@ Converts arrays of numbers to strings using a custom character set and back.
 Converts single numbers to their corresponding character representation and back.
 
 #### `runaCantorPair()` → `RunaSync<[number, number], number>`
-Encodes two numbers into a single number using the Cantor pairing function and back. Useful for hashing coordinate pairs.
+Encodes two numbers into a single number using the Cantor pairing function and back.
 
 #### `runaCantorPairArray()` → `RunaSync<[number, number][], number[]>`
 Applies Cantor pairing to arrays of number pairs.
@@ -161,10 +159,10 @@ Converts Uint8Array buffers to number arrays and back.
 ### Cryptographic & Security
 
 #### `runaAesGcm(key: string | BufferSource, salt?: BufferSource)` → `Promise<RunaAsync<string, Uint8ArrayLike>>`
-Asynchronous AES-256-GCM encryption/decryption with key derivation. Perfect for sensitive data in transformation chains.
+Asynchronous AES-256-GCM encryption/decryption with key derivation.
 
 #### `runaFF1(key: string | Buffer, tweak: string | Buffer, alphabet?: string, minLength?: number, maxLength?: number)` → `RunaAsync<string, string>`
-Format-Preserving Encryption (FF1) for strings. Encrypts data while maintaining the same format and length. Ideal for ID obfuscation, tokenization, and YouTube-style ID generation.
+Format-Preserving Encryption (FF1) for strings. Encrypts data while maintaining the same format and length.
 
 ## License
 
@@ -172,4 +170,4 @@ MIT License - See [LICENSE](LICENSE) file for details.
 
 ---
 
-ᚱᚢᚾᛅ - Built with 🔮 by [FimbulWorks](https://github.com/fimbul-works)
+Built with 🔮 by [FimbulWorks](https://github.com/fimbul-works)
