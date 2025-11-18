@@ -1,7 +1,7 @@
 {
   "name": "@fimbul-works/runa",
   "description": "Rúna is a collection of utilities to perform bidirectional transformations.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "private": false,
   "license": "MIT",
@@ -24,17 +24,113 @@
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js"
     },
+    "./add": {
+      "types": "./dist/esm/add.d.ts",
+      "import": "./dist/esm/add.js",
+      "require": "./dist/cjs/add.js"
+    },
     "./aes-gcm": {
       "types": "./dist/esm/aes-gcm.d.ts",
       "import": "./dist/esm/aes-gcm.js",
       "require": "./dist/cjs/aes-gcm.js"
+    },
+    "./array-flatten": {
+      "types": "./dist/esm/array-flatten.d.ts",
+      "import": "./dist/esm/array-flatten.js",
+      "require": "./dist/cjs/array-flatten.js"
+    },
+    "./array-join": {
+      "types": "./dist/esm/array-join.d.ts",
+      "import": "./dist/esm/array-join.js",
+      "require": "./dist/cjs/array-join.js"
+    },
+    "./array-split": {
+      "types": "./dist/esm/array-split.d.ts",
+      "import": "./dist/esm/array-split.js",
+      "require": "./dist/cjs/array-split.js"
+    },
+    "./base64": {
+      "types": "./dist/esm/base64.d.ts",
+      "import": "./dist/esm/base64.js",
+      "require": "./dist/cjs/base64.js"
+    },
+    "./buffer-to-array": {
+      "types": "./dist/esm/buffer-to-array.d.ts",
+      "import": "./dist/esm/buffer-to-array.js",
+      "require": "./dist/cjs/buffer-to-array.js"
+    },
+    "./cantor-pair-array": {
+      "types": "./dist/esm/cantor-pair-array.d.ts",
+      "import": "./dist/esm/cantor-pair-array.js",
+      "require": "./dist/cjs/cantor-pair-array.js"
+    },
+    "./cantor-pair": {
+      "types": "./dist/esm/cantor-pair.d.ts",
+      "import": "./dist/esm/cantor-pair.js",
+      "require": "./dist/cjs/cantor-pair.js"
+    },
+    "./ff1": {
+      "types": "./dist/esm/ff1.d.ts",
+      "import": "./dist/esm/ff1.js",
+      "require": "./dist/cjs/ff1.js"
+    },
+    "./json": {
+      "types": "./dist/esm/json.d.ts",
+      "import": "./dist/esm/json.js",
+      "require": "./dist/cjs/json.js"
+    },
+    "./multiply": {
+      "types": "./dist/esm/multiply.d.ts",
+      "import": "./dist/esm/multiply.js",
+      "require": "./dist/cjs/multiply.js"
+    },
+    "./number-array-charset": {
+      "types": "./dist/esm/number-array-charset.d.ts",
+      "import": "./dist/esm/number-array-charset.js",
+      "require": "./dist/cjs/number-array-charset.js"
+    },
+    "./number-charset": {
+      "types": "./dist/esm/number-charset.d.ts",
+      "import": "./dist/esm/number-charset.js",
+      "require": "./dist/cjs/number-charset.js"
+    },
+    "./number-to-char": {
+      "types": "./dist/esm/number-to-char.d.ts",
+      "import": "./dist/esm/number-to-char.js",
+      "require": "./dist/cjs/number-to-char.js"
+    },
+    "./power": {
+      "types": "./dist/esm/power.d.ts",
+      "import": "./dist/esm/power.js",
+      "require": "./dist/cjs/power.js"
+    },
+    "./runa": {
+      "types": "./dist/esm/runa.d.ts",
+      "import": "./dist/esm/runa.js",
+      "require": "./dist/cjs/runa.js"
+    },
+    "./string-pad": {
+      "types": "./dist/esm/string-pad.d.ts",
+      "import": "./dist/esm/string-pad.js",
+      "require": "./dist/cjs/string-pad.js"
+    },
+    "./string-to-buffer": {
+      "types": "./dist/esm/string-to-buffer.d.ts",
+      "import": "./dist/esm/string-to-buffer.js",
+      "require": "./dist/cjs/string-to-buffer.js"
+    },
+    "./string-to-number": {
+      "types": "./dist/esm/string-to-number.d.ts",
+      "import": "./dist/esm/string-to-number.js",
+      "require": "./dist/cjs/string-to-number.js"
+    },
+    "./uri": {
+      "types": "./dist/esm/uri.d.ts",
+      "import": "./dist/esm/uri.js",
+      "require": "./dist/cjs/uri.js"
     }
   },
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
-  ],
+  "files": ["dist", "README.md", "LICENSE"],
   "sideEffects": false,
   "scripts": {
     "build": "rm -rf dist && pnpm build:esm && pnpm build:cjs",
