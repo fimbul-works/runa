@@ -51,6 +51,7 @@
     "vitest": "^4.0.9"
   },
   "dependencies": {
-    "ff1-js": "^1.0.2"
+    "ff1-js": "^1.0.2",
+    "superjson": "^2.2.5"
   }
 }

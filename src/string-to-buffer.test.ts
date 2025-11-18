@@ -47,12 +47,16 @@ describe("runaStringToBuffer", () => {
     }
 
     // Empty strings should throw as they indicate data loss
-    expect(() => bufferTransformer.encode("")).toThrow("String cannot be empty");
+    expect(() => bufferTransformer.encode("")).toThrow(
+      "String cannot be empty",
+    );
   });
 
   it("should handle empty string", () => {
     // Empty strings should throw as they indicate data loss
-    expect(() => bufferTransformer.encode("")).toThrow("String cannot be empty");
+    expect(() => bufferTransformer.encode("")).toThrow(
+      "String cannot be empty",
+    );
   });
 
   it("should handle Unicode characters correctly", () => {
@@ -239,7 +243,9 @@ describe("runaStringToBuffer", () => {
   it("should handle empty buffers correctly", () => {
     const emptyBuffer = new Uint8Array(0);
     // Empty buffers should throw as they indicate data loss
-    expect(() => bufferTransformer.decode(emptyBuffer)).toThrow("Buffer cannot be empty");
+    expect(() => bufferTransformer.decode(emptyBuffer)).toThrow(
+      "Buffer cannot be empty",
+    );
   });
 
   it("should work with TextEncoder/TextDecoder options", () => {

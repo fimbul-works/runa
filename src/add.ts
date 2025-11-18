@@ -1,5 +1,5 @@
-import { createRuna } from "./runa";
-import { serializeValue } from "./util";
+import { createRuna } from "./runa.js";
+import { serializeValue } from "./util.js";
 
 /**
  * Creates a bidirectional addition transformation.

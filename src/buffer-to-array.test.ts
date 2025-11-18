@@ -131,12 +131,12 @@ describe("runaBufferToArray", () => {
       const uint16Array = new Uint16Array(buffer);
       uint16Array[0] = 0x1234;
       uint16Array[1] = 0x5678;
-      uint16Array[2] = 0x9ABC;
-      uint16Array[3] = 0xDEF0;
+      uint16Array[2] = 0x9abc;
+      uint16Array[3] = 0xdef0;
 
       const uint8View = new Uint8Array(buffer);
       const result = bufferToArray.encode(uint8View);
-      expect(result).toEqual([0x34, 0x12, 0x78, 0x56, 0xBC, 0x9A, 0xF0, 0xDE]);
+      expect(result).toEqual([0x34, 0x12, 0x78, 0x56, 0xbc, 0x9a, 0xf0, 0xde]);
     });
   });
 
@@ -174,7 +174,9 @@ describe("runaBufferToArray", () => {
       sparseArray[9] = 255;
 
       const result = bufferToArray.decode(sparseArray);
-      expect(result).toEqual(new Uint8Array([1, 0, 0, 0, 0, 100, 0, 0, 0, 255]));
+      expect(result).toEqual(
+        new Uint8Array([1, 0, 0, 0, 0, 100, 0, 0, 0, 255]),
+      );
     });
   });
 
@@ -195,7 +197,9 @@ describe("runaBufferToArray", () => {
 
     it("should handle null and undefined inputs", () => {
       // The implementation actually throws on null/undefined for encode
-      expect(() => bufferToArray.encode(null as any)).toThrow("object null is not iterable");
+      expect(() => bufferToArray.encode(null as any)).toThrow(
+        "object null is not iterable",
+      );
       expect(() => bufferToArray.encode(undefined as any)).toThrow();
 
       // But decode handles them gracefully by converting to empty arrays
@@ -243,16 +247,44 @@ describe("runaBufferToArray", () => {
     it("should handle binary data conversion", () => {
       // Simulate binary file data
       const binaryData = new Uint8Array([
-        0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, // PNG header
-        0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52, // IHDR chunk start
+        0x89,
+        0x50,
+        0x4e,
+        0x47,
+        0x0d,
+        0x0a,
+        0x1a,
+        0x0a, // PNG header
+        0x00,
+        0x00,
+        0x00,
+        0x0d,
+        0x49,
+        0x48,
+        0x44,
+        0x52, // IHDR chunk start
       ]);
 
       const array = bufferToArray.encode(binaryData);
       const restored = bufferToArray.decode(array);
 
       expect(array).toEqual([
-        137, 80, 78, 71, 13, 10, 26, 10, // PNG header in decimal
-        0, 0, 0, 13, 73, 72, 68, 82,     // IHDR chunk start in decimal
+        137,
+        80,
+        78,
+        71,
+        13,
+        10,
+        26,
+        10, // PNG header in decimal
+        0,
+        0,
+        0,
+        13,
+        73,
+        72,
+        68,
+        82, // IHDR chunk start in decimal
       ]);
       expect(restored).toEqual(binaryData);
     });
@@ -260,10 +292,26 @@ describe("runaBufferToArray", () => {
     it("should handle network packet data", () => {
       // Simulate a simple network packet
       const packet = new Uint8Array([
-        0x45, 0x00, 0x00, 0x3C, // IP header
-        0x6A, 0xB6, 0x40, 0x00, 0x40, 0x06, 0x00, 0x00, // More IP header
-        0xC0, 0xA8, 0x01, 0x01, // Source IP
-        0xC0, 0xA8, 0x01, 0x02, // Dest IP
+        0x45,
+        0x00,
+        0x00,
+        0x3c, // IP header
+        0x6a,
+        0xb6,
+        0x40,
+        0x00,
+        0x40,
+        0x06,
+        0x00,
+        0x00, // More IP header
+        0xc0,
+        0xa8,
+        0x01,
+        0x01, // Source IP
+        0xc0,
+        0xa8,
+        0x01,
+        0x02, // Dest IP
       ]);
 
       const array = bufferToArray.encode(packet);
@@ -276,7 +324,10 @@ describe("runaBufferToArray", () => {
     it("should handle image pixel data", () => {
       // Simulate 2x2 grayscale image data
       const pixelData = new Uint8Array([
-        255, 0, 128, 64, // Four grayscale pixels
+        255,
+        0,
+        128,
+        64, // Four grayscale pixels
       ]);
 
       const array = bufferToArray.encode(pixelData);

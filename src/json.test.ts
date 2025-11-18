@@ -12,7 +12,7 @@ describe("runaJSON", () => {
   let json: ReturnType<typeof runaJSON<TestObject>>;
 
   beforeEach(() => {
-    json = runaJSON<TestObject>();
+    json = runaJSON<TestObject>(false); // Use standard JSON for existing tests
   });
 
   it("should encode simple object to JSON string", () => {
@@ -193,5 +193,97 @@ describe("runaJSON", () => {
     expect(decoded.a).toBe(1);
     expect(decoded.b).toBe(2);
     expect(decoded.c).toBe(3);
+  });
+});
+
+describe("runaJSON with SuperJSON", () => {
+  interface ComplexObject {
+    date: Date;
+    map: Map<string, number>;
+    set: Set<string>;
+    regex: RegExp;
+  }
+
+  it("should use SuperJSON by default for complex data types", () => {
+    const json = runaJSON<ComplexObject>(); // Uses SuperJSON by default
+
+    const date = new Date("2023-12-25T10:30:00.000Z");
+    const map = new Map([
+      ["key1", 1],
+      ["key2", 2],
+    ]);
+    const set = new Set(["a", "b", "c"]);
+    const regex = /test/g;
+
+    const input: ComplexObject = {
+      date,
+      map,
+      set,
+      regex,
+    };
+
+    const encoded = json.encode(input) as string;
+    const decoded = json.decode(encoded) as ComplexObject;
+
+    // Verify complex types are properly restored
+    expect(decoded.date).toBeInstanceOf(Date);
+    expect(decoded.date.getTime()).toBe(date.getTime());
+    expect(decoded.map).toBeInstanceOf(Map);
+    expect(decoded.map.get("key1")).toBe(1);
+    expect(decoded.map.get("key2")).toBe(2);
+    expect(decoded.set).toBeInstanceOf(Set);
+    expect(decoded.set.has("a")).toBe(true);
+    expect(decoded.set.has("b")).toBe(true);
+    expect(decoded.set.has("c")).toBe(true);
+    expect(decoded.regex).toBeInstanceOf(RegExp);
+    expect(decoded.regex.source).toBe(regex.source);
+    expect(decoded.regex.flags).toBe(regex.flags);
+  });
+
+  it("should be bidirectional with SuperJSON", () => {
+    const json = runaJSON<ComplexObject>();
+
+    const original: ComplexObject = {
+      date: new Date("2023-01-01"),
+      map: new Map([["test", 42]]),
+      set: new Set(["x", "y"]),
+      regex: /^hello$/i,
+    };
+
+    const encoded = json.encode(original) as string;
+    const decoded = json.decode(encoded) as ComplexObject;
+
+    // Test complete round-trip
+    expect(decoded.date.getTime()).toBe(original.date.getTime());
+    expect(decoded.map.get("test")).toBe(42);
+    expect(Array.from(decoded.set)).toEqual(["x", "y"]);
+    expect(decoded.regex.source).toBe(original.regex.source);
+    expect(decoded.regex.flags).toBe(original.regex.flags);
+  });
+
+  it("should allow disabling SuperJSON for standard JSON behavior", () => {
+    const json = runaJSON<ComplexObject>(false); // Disable SuperJSON
+
+    const input: ComplexObject = {
+      date: new Date("2023-12-25T10:30:00.000Z"),
+      map: new Map([["key1", 1]]),
+      set: new Set(["a"]),
+      regex: /test/g,
+    };
+
+    // With standard JSON, these will be converted to plain objects
+    const encoded = json.encode(input) as string;
+    const decoded = json.decode(encoded) as any;
+
+    // Date becomes string
+    expect(typeof decoded.date).toBe("string");
+    // Map becomes empty object
+    expect(typeof decoded.map).toBe("object");
+    expect(Object.keys(decoded.map).length).toBe(0);
+    // Set becomes empty object
+    expect(typeof decoded.set).toBe("object");
+    expect(Object.keys(decoded.set).length).toBe(0);
+    // Regex becomes empty object
+    expect(typeof decoded.regex).toBe("object");
   });
 });

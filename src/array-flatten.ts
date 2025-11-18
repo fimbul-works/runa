@@ -20,7 +20,7 @@ import { serializeValue } from "./util.js";
  *
  * @example
  * // Flatten and reconstruct character arrays
- * const charFlattener = runaFlatten<string>(4);
+ * const charFlattener = runaArrayFlatten<string>(4);
  *
  * const charChunks = [
  *   ["H", "e", "l", "l"],
@@ -39,7 +39,7 @@ import { serializeValue } from "./util.js";
  *
  * @example
  * // Process number blocks in calculations
- * const numberFlattener = runaFlatten<number>(3);
+ * const numberFlattener = runaArrayFlatten<number>(3);
  *
  * const numberBlocks = [
  *   [1, 2, 3],
@@ -60,7 +60,7 @@ import { serializeValue } from "./util.js";
  *
  * @example
  * // Use in data processing pipelines
- * const processor = runaFlatten<number>(16); // 16-byte blocks
+ * const processor = runaArrayFlatten<number>(16); // 16-byte blocks
  *
  * const cryptoBlocks = [
  *   new Array(16).fill(0), // Block 1
@@ -81,7 +81,7 @@ import { serializeValue } from "./util.js";
  *   value: string;
  * }
  *
- * const dataFlattener = runaFlatten<DataItem>(2);
+ * const dataFlattener = runaArrayFlatten<DataItem>(2);
  *
  * const dataChunks = [
  *   [{ id: 1, value: "a" }, { id: 2, value: "b" }],
@@ -98,7 +98,7 @@ import { serializeValue } from "./util.js";
  * @example
  * // Error handling for invalid chunks
  * try {
- *   const flattener = runaFlatten(3);
+ *   const flattener = runaArrayFlatten(3);
  *   const invalidChunks = [
  *     [1, 2, 3],
  *     [4, 5, 6, 7] // Too many elements (4 > chunkSize 3)
@@ -110,20 +110,20 @@ import { serializeValue } from "./util.js";
  *
  * // Error handling for invalid chunk size
  * try {
- *   runaFlatten(0);
+ *   runaArrayFlatten(0);
  * } catch (error) {
  *   console.log(error.message); // "Chunk size must be a positive integer"
  * }
  *
  * // Error handling for invalid input types
  * try {
- *   const flattener = runaFlatten(2);
+ *   const flattener = runaArrayFlatten(2);
  *   flattener.encode("not an array");
  * } catch (error) {
  *   console.log(error.message); // "Invalid array: not an array"
  * }
  */
-export const runaFlatten = <T>(chunkSize: number) => {
+export const runaArrayFlatten = <T>(chunkSize: number) => {
   if (chunkSize < 1) {
     throw new Error("Chunk size must be a positive integer");
   }

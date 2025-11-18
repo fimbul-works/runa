@@ -5,7 +5,9 @@ describe("runaNumberArrayCharset", () => {
   let numberArrayCharset: ReturnType<typeof runaNumberArrayCharset>;
 
   beforeEach(() => {
-    numberArrayCharset = runaNumberArrayCharset("abcdefghijklmnopqrstuvwxyz0123456789");
+    numberArrayCharset = runaNumberArrayCharset(
+      "abcdefghijklmnopqrstuvwxyz0123456789",
+    );
   });
 
   describe("Basic functionality", () => {
@@ -30,7 +32,9 @@ describe("runaNumberArrayCharset", () => {
 
     it("should handle empty string", () => {
       const input = "";
-      expect(() => numberArrayCharset.decode(input)).toThrow("Cannot decode empty string");
+      expect(() => numberArrayCharset.decode(input)).toThrow(
+        "Cannot decode empty string",
+      );
     });
 
     it("should handle single number", () => {
@@ -96,7 +100,9 @@ describe("runaNumberArrayCharset", () => {
 
   describe("Custom alphabets", () => {
     it("should work with uppercase alphabet", () => {
-      const uppercaseCharset = runaNumberArrayCharset("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
+      const uppercaseCharset = runaNumberArrayCharset(
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      );
       const original = [0, 1, 2, 25, 35];
       const encoded = uppercaseCharset.encode(original);
       const decoded = uppercaseCharset.decode(encoded);
@@ -114,11 +120,15 @@ describe("runaNumberArrayCharset", () => {
     });
 
     it("should throw on emoji alphabet (non-ASCII)", () => {
-      expect(() => runaNumberArrayCharset("😀😃😄😁😆😅🤣😂🙂😉")).toThrow("Alphabet must contain only ASCII characters");
+      expect(() => runaNumberArrayCharset("😀😃😄😁😆😅🤣😂🙂😉")).toThrow(
+        "Alphabet must contain only ASCII characters",
+      );
     });
 
     it("should throw on unicode characters (non-ASCII)", () => {
-      expect(() => runaNumberArrayCharset("αβγδεζηθικλμνξοπρστυφχψω")).toThrow("Alphabet must contain only ASCII characters");
+      expect(() => runaNumberArrayCharset("αβγδεζηθικλμνξοπρστυφχψω")).toThrow(
+        "Alphabet must contain only ASCII characters",
+      );
     });
 
     it("should work with binary alphabet", () => {
@@ -163,42 +173,66 @@ describe("runaNumberArrayCharset", () => {
     });
 
     it("should throw on minLength=0", () => {
-      expect(() => runaNumberArrayCharset("ab", 0)).toThrow("Minimum length must be at least 1");
+      expect(() => runaNumberArrayCharset("ab", 0)).toThrow(
+        "Minimum length must be at least 1",
+      );
     });
   });
 
   describe("Error handling", () => {
     it("should throw on null input for encode", () => {
-      expect(() => numberArrayCharset.encode(null as any)).toThrow("Invalid array");
+      expect(() => numberArrayCharset.encode(null as any)).toThrow(
+        "Invalid array",
+      );
     });
 
     it("should throw on undefined input for encode", () => {
-      expect(() => numberArrayCharset.encode(undefined as any)).toThrow("Invalid array");
+      expect(() => numberArrayCharset.encode(undefined as any)).toThrow(
+        "Invalid array",
+      );
     });
 
     it("should throw on non-array input for encode", () => {
-      expect(() => numberArrayCharset.encode("not an array" as any)).toThrow("Invalid array");
-      expect(() => numberArrayCharset.encode(123 as any)).toThrow("Invalid array");
-      expect(() => numberArrayCharset.encode({} as any)).toThrow("Invalid array");
+      expect(() => numberArrayCharset.encode("not an array" as any)).toThrow(
+        "Invalid array",
+      );
+      expect(() => numberArrayCharset.encode(123 as any)).toThrow(
+        "Invalid array",
+      );
+      expect(() => numberArrayCharset.encode({} as any)).toThrow(
+        "Invalid array",
+      );
     });
 
     it("should throw on null input for decode", () => {
-      expect(() => numberArrayCharset.decode(null as any)).toThrow("Invalid string");
+      expect(() => numberArrayCharset.decode(null as any)).toThrow(
+        "Invalid string",
+      );
     });
 
     it("should throw on undefined input for decode", () => {
-      expect(() => numberArrayCharset.decode(undefined as any)).toThrow("Invalid string");
+      expect(() => numberArrayCharset.decode(undefined as any)).toThrow(
+        "Invalid string",
+      );
     });
 
     it("should throw on non-string input for decode", () => {
-      expect(() => numberArrayCharset.decode(123 as any)).toThrow("Invalid string");
-      expect(() => numberArrayCharset.decode([] as any)).toThrow("Invalid string");
-      expect(() => numberArrayCharset.decode({} as any)).toThrow("Invalid string");
+      expect(() => numberArrayCharset.decode(123 as any)).toThrow(
+        "Invalid string",
+      );
+      expect(() => numberArrayCharset.decode([] as any)).toThrow(
+        "Invalid string",
+      );
+      expect(() => numberArrayCharset.decode({} as any)).toThrow(
+        "Invalid string",
+      );
     });
 
     it("should throw on empty chunk in encoded string", () => {
       const malformedInput = "a|b||d";
-      expect(() => numberArrayCharset.decode(malformedInput)).toThrow("Empty chunk found in encoded string");
+      expect(() => numberArrayCharset.decode(malformedInput)).toThrow(
+        "Empty chunk found in encoded string",
+      );
     });
 
     it("should throw on malformed chunks", () => {
@@ -216,8 +250,12 @@ describe("runaNumberArrayCharset", () => {
       expect(decoded).toEqual(original);
     });
     it("should throw on negative numbers", () => {
-      expect(() => numberArrayCharset.encode([-1, -5, -10])).toThrow("Cannot encode negative numbers");
-      expect(() => numberArrayCharset.encode([-5, 10, 0, -3, 7])).toThrow("Cannot encode negative numbers");
+      expect(() => numberArrayCharset.encode([-1, -5, -10])).toThrow(
+        "Cannot encode negative numbers",
+      );
+      expect(() => numberArrayCharset.encode([-5, 10, 0, -3, 7])).toThrow(
+        "Cannot encode negative numbers",
+      );
     });
 
     it("should floor floating point numbers", () => {
@@ -267,7 +305,7 @@ describe("runaNumberArrayCharset", () => {
   describe("Real-world scenarios", () => {
     it("should generate YouTube-like IDs from number arrays", () => {
       const youtubeCharset = runaNumberArrayCharset(
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-",
       );
       const original = [0, 10, 35, 60, 61]; // First few values
       const encoded = youtubeCharset.encode(original);
@@ -277,7 +315,7 @@ describe("runaNumberArrayCharset", () => {
 
     it("should handle base64-like encoding", () => {
       const base64Charset = runaNumberArrayCharset(
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",
       );
       const original = [0, 26, 51, 52, 62, 63];
       const encoded = base64Charset.encode(original);
@@ -288,7 +326,7 @@ describe("runaNumberArrayCharset", () => {
 
     it("should work with URL-safe encoding", () => {
       const urlSafeCharset = runaNumberArrayCharset(
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_",
       );
       const original = [0, 52, 53, 62, 63];
       const encoded = urlSafeCharset.encode(original);
@@ -361,7 +399,7 @@ describe("runaNumberArrayCharset", () => {
       const encoded = numberArrayCharset.encode(original);
 
       // Can now treat as string for operations like sorting, searching, etc.
-      const sorted = encoded.split('|').sort().join('|');
+      const sorted = encoded.split("|").sort().join("|");
       const decoded = numberArrayCharset.decode(sorted);
 
       expect(decoded).not.toEqual(original); // Sorted order changes the number sequence
@@ -369,7 +407,9 @@ describe("runaNumberArrayCharset", () => {
     });
 
     it("should be useful for creating compact identifiers", () => {
-      const idCharset = runaNumberArrayCharset("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
+      const idCharset = runaNumberArrayCharset(
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      );
       const userIds = [123, 456, 789, 101112];
       const compactIds = idCharset.encode(userIds);
       const restoredIds = idCharset.decode(compactIds);
@@ -377,7 +417,9 @@ describe("runaNumberArrayCharset", () => {
     });
 
     it("should handle database key generation", () => {
-      const keyCharset = runaNumberArrayCharset("abcdefghijklmnopqrstuvwxyz0123456789");
+      const keyCharset = runaNumberArrayCharset(
+        "abcdefghijklmnopqrstuvwxyz0123456789",
+      );
       const keys = [1, 2, 3, 4, 5];
       const stringKeys = keyCharset.encode(keys);
       const restoredKeys = keyCharset.decode(stringKeys);
@@ -387,17 +429,22 @@ describe("runaNumberArrayCharset", () => {
 
   describe("Alphabet validation", () => {
     it("should throw on single character alphabet", () => {
-      expect(() => runaNumberArrayCharset("A")).toThrow("Alphabet must have at least 2 characters");
+      expect(() => runaNumberArrayCharset("A")).toThrow(
+        "Alphabet must have at least 2 characters",
+      );
     });
 
     it("should throw on duplicate characters in alphabet", () => {
-      expect(() => runaNumberArrayCharset("AABBC")).toThrow("Alphabet must contain unique characters");
+      expect(() => runaNumberArrayCharset("AABBC")).toThrow(
+        "Alphabet must contain unique characters",
+      );
     });
 
     it("should handle very long alphabets", () => {
-      const longAlphabet = Array.from({ length: 100 }, (_, i) =>
-        String.fromCharCode(33 + i) // ASCII characters from ! onwards
-      ).join('');
+      const longAlphabet = Array.from(
+        { length: 100 },
+        (_, i) => String.fromCharCode(33 + i), // ASCII characters from ! onwards
+      ).join("");
 
       const longCharset = runaNumberArrayCharset(longAlphabet);
       const original = [0, 50, 99];

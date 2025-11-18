@@ -74,7 +74,7 @@ console.log(array); // [72, 101, 108, 108, 111, 44, 32, 82, 117, 110, 97, 33]
 console.log(reconstructedString); // "Hello, Runa!"
 ```
 
-This example demonstrates how Runa enables you to build complex transformation pipelines while maintaining type safety and bidirectional transformations at each step.
+This example demonstrates how *Runa* enables you to build complex transformation pipelines while maintaining type safety and bidirectional transformations at each step.
 
 ---
 
@@ -95,8 +95,8 @@ Creates a bidirectional asynchronous transformation between any two types.
 #### `runaBase64()` → `RunaSync<string, string>`
 Converts between plain text and Base64 encoding. Handles Unicode characters correctly and works in both Node.js and browser environments.
 
-#### `runaJSON<T>()` → `RunaSync<T, string>`
-Converts between TypeScript objects and JSON strings. Type-safe serialization/deserialization.
+#### `runaJSON<T>(useSuperJSON?: boolean)` → `RunaSync<T, string>`
+Converts between TypeScript objects and JSON strings with enhanced capabilities. Uses SuperJSON by default to handle complex data types like Dates, Maps, Sets, and custom classes, ensuring perfect bidirectional conversion. Set `useSuperJSON` to `false` for standard JSON behavior.
 
 #### `runaURI()` → `RunaSync<string, string>`
 Encodes and decodes URI components using `encodeURIComponent` and `decodeURIComponent`.
@@ -104,17 +104,28 @@ Encodes and decodes URI components using `encodeURIComponent` and `decodeURIComp
 #### `runaStringSplit(delimiter: string)` → `RunaSync<string, string[]>`
 Splits strings into arrays and rejoins them with a specified delimiter. Perfect for CSV-style data.
 
-#### `runaStringClean(separator = "|")` → `RunaSync<string, string>`
-*Heuristic-based*: Removes separators from strings and attempts to restore them using chunking patterns. **Not perfectly reversible** - best for approximate restoration.
-
-#### `runaStringSeparator(separator = "|")` → `RunaSync<string, string>`
-*Perfectly reversible*: Removes and restores exact separator positions using encoding markers. Ideal for transformation chains.
-
 #### `runaStringToNumber(radix?: number)` → `RunaSync<string, number>`
 Converts strings to numbers and back using specified radix (base).
 
 #### `runaStringToBuffer()` → `RunaSync<string, Uint8Array>`
 Converts UTF-8 strings to Uint8Array buffers and back.
+
+#### `runaStringPadStart(maxLength: number, fillString: string)` → `RunaSync<string, string>`
+Adds padding to the beginning of strings to reach a specified maximum length. Perfect for ID formatting, zero-padding numbers, or creating fixed-width displays. Handles multi-character fill strings and Unicode characters.
+
+#### `runaStringPadEnd(maxLength: number, fillString: string)` → `RunaSync<string, string>`
+Adds padding to the end of strings to reach a specified maximum length. Ideal for right-aligning text, formatting data for display, or creating trailing padding. Handles multi-character fill strings and Unicode characters.
+
+### Arithmetic Operations
+
+#### `runaAdd(additive: number)` → `RunaSync<number, number>`
+Adds a constant value during encoding and subtracts it during decoding. Perfect for applying offsets, coordinate transformations, data normalization, or any scenario requiring reversible numeric adjustments.
+
+#### `runaMultiply(multiplier: number)` → `RunaSync<number, number>`
+Multiplies by a constant value during encoding and divides by the same value during decoding. Ideal for unit conversions, scaling coordinates, currency conversions, or applying multiplicative transformations. Throws error if multiplier is zero.
+
+#### `runaPower(exponent: number)` → `RunaSync<number, number>`
+Raises to a power during encoding and takes the corresponding root during decoding. Perfect for square/cube transformations, geometric calculations, area/volume conversions, or scientific calculations. Handles negative values with odd exponents and throws error for invalid combinations.
 
 ### Number & Array Processing
 
@@ -147,10 +158,10 @@ Converts Uint8Array buffers to number arrays and back.
 
 ### Cryptographic & Security
 
-#### `runaAESGCM(key: string)` → `Promise<RunaAsync<string, Uint8Array>>`
+#### `runaAesGcm(key: string | BufferSource, salt?: BufferSource)` → `Promise<RunaAsync<string, Uint8ArrayLike>>`
 Asynchronous AES-256-GCM encryption/decryption with key derivation. Perfect for sensitive data in transformation chains.
 
-#### `runaFF1(key: string, options)` → `RunaAsync<string, string>`
+#### `runaFF1(key: string | Buffer, tweak: string | Buffer, alphabet?: string, minLength?: number, maxLength?: number)` → `RunaAsync<string, string>`
 Format-Preserving Encryption (FF1) for strings. Encrypts data while maintaining the same format and length. Ideal for ID obfuscation, tokenization, and YouTube-style ID generation.
 
 ### Example: ID Generation Pipeline
@@ -158,7 +169,7 @@ Format-Preserving Encryption (FF1) for strings. Encrypts data while maintaining 
 Create YouTube-style IDs from numbers with perfect reversibility:
 
 ```typescript
-import { runFF1 } from '@fimbul-works/runa';
+import { runaFF1 } from '@fimbul-works/runa';
 
 // With FF1 encryption (format-preserving)
 const secureIdEncoder = runaFF1(
@@ -181,20 +192,20 @@ Build a complete data processing pipeline with encryption:
 import {
   runaJSON,
   runaBase64,
-  runaAESGCM,
+  runaAesGcm,
   createRunaAsync
 } from '@fimbul-works/runa';
 
 type SecureData = {
   userId: number;
   message: string;
-  timestamp: number;
+  timestamp: Date; // Using Date with SuperJSON
 };
 
-// Build secure pipeline
+// Build secure pipeline (uses SuperJSON by default)
 const securePipeline = runaJSON<SecureData>()
   .chain(runaBase64())
-  .chainAsync(await runaAESGCM('your-secret-key'));
+  .chainAsync(await runaAesGcm('your-secret-key'));
 
 const decryptPipeline = securePipeline.reversed();
 
@@ -202,14 +213,98 @@ const decryptPipeline = securePipeline.reversed();
 const data: SecureData = {
   userId: 12345,
   message: 'Secret message',
-  timestamp: Date.now()
+  timestamp: new Date()
 };
 
 const encrypted = await securePipeline.encode(data);
 const decrypted = await decryptPipeline.decode(encrypted);
 
 console.log(encrypted); // Encrypted Uint8Array
-console.log(decrypted); // Original SecureData object
+console.log(decrypted); // Original SecureData object with Date perfectly restored
+console.log(decrypted.timestamp instanceof Date); // true
+```
+
+### Example: Enhanced JSON with Complex Data Types
+
+Use SuperJSON for perfect serialization of complex JavaScript objects:
+
+```typescript
+import { runaJSON } from '@fimbul-works/runa';
+
+interface ComplexData {
+  created: Date;
+  settings: Map<string, boolean>;
+  tags: Set<string>;
+  metadata: {
+    version: number;
+    features: string[];
+  };
+}
+
+// Uses SuperJSON by default - handles complex types perfectly
+const enhancedJson = runaJSON<ComplexData>();
+
+const data: ComplexData = {
+  created: new Date('2023-01-01'),
+  settings: new Map([['darkMode', true], ['notifications', false]]),
+  tags: new Set(['important', 'review', 'archived']),
+  metadata: {
+    version: 2,
+    features: ['search', 'filters', 'export']
+  }
+};
+
+const serialized = enhancedJson.encode(data);
+const restored = enhancedJson.decode(serialized);
+
+// All complex types are perfectly preserved
+console.log(restored.created instanceof Date); // true
+console.log(restored.settings instanceof Map); // true
+console.log(restored.tags instanceof Set); // true
+console.log(restored.settings.get('darkMode')); // true
+console.log(restored.tags.has('important')); // true
+
+// For standard JSON compatibility
+const standardJson = runaJSON<ComplexData>(false);
+const standardSerialized = standardJson.encode(data);
+// Date becomes string, Map/Set become plain objects
+```
+
+### Example: Configuration Management with Versioning
+
+Combine SuperJSON for rich data with arithmetic operations for version handling:
+
+```typescript
+import { runaJSON, runaAdd, runaMultiply } from '@fimbul-works/runa';
+
+interface AppConfiguration {
+  version: number;
+  settings: {
+    theme: 'light' | 'dark';
+    language: string;
+    features: Set<string>;
+  };
+  lastModified: Date;
+}
+
+const configTransformer = runaJSON<AppConfiguration>();
+const versionIncrement = runaAdd(1);
+
+// Load configuration and increment version
+const currentConfig = { /* ... existing config ... */ };
+const nextVersionConfig = createRuna(
+  (config: AppConfiguration) => ({
+    ...config,
+    version: versionIncrement.encode(config.version)
+  }),
+  (config: AppConfiguration) => ({
+    ...config,
+    version: versionIncrement.decode(config.version)
+  })
+);
+
+const updatedConfig = nextVersionConfig.encode(currentConfig);
+const serializedConfig = configTransformer.encode(updatedConfig);
 ```
 
 ### Example: CSV Processing
@@ -251,6 +346,124 @@ const backToCsv = parseUserCSV.decode(userRecord);
 
 console.log(userRecord);  // { id: 12345, name: "John Doe", email: "john@example.com", active: true }
 console.log(backToCsv);  // "12345,John Doe,john@example.com,true"
+```
+
+### Example: Temperature Conversion Pipeline
+
+Create a complete Celsius to Fahrenheit conversion using arithmetic operations:
+
+```typescript
+import { runaMultiply, runaAdd } from '@fimbul-works/runa';
+
+// Build the complete temperature conversion pipeline
+const celsiusToFahrenheit = runaMultiply(1.8).chain(runaAdd(32));
+const fahrenheitToCelsius = celsiusToFahrenheit.reversed();
+
+// Convert temperatures
+const celsius = 25;
+const fahrenheit = celsiusToFahrenheit.encode(celsius);
+// 77 (25 * 1.8 + 32)
+
+const backToCelsius = fahrenheitToCelsius.decode(fahrenheit);
+// 25 ((77 - 32) / 1.8)
+
+console.log(`${celsius}°C = ${fahrenheit}°F`);  // "25°C = 77°F"
+console.log(`${fahrenheit}°F = ${backToCelsius}°C`);  // "77°F = 25°C"
+```
+
+### Example: Coordinate Transformation and Scaling
+
+Apply arithmetic transformations for game development or graphics:
+
+```typescript
+import { runaMultiply, runaAdd, runaPower } from '@fimbul-works/runa';
+
+// Create coordinate transformation pipeline
+const transformCoordinates = createRuna(
+  (coords: { x: number; y: number }) => ({
+    // Scale coordinates
+    scaledX: coords.x * 2,
+    scaledY: coords.y * 2,
+    // Apply offset
+    offsetX: coords.x + 100,
+    offsetY: coords.y + 50
+  }),
+  (transformed: { scaledX: number; scaledY: number; offsetX: number; offsetY: number }) => ({
+    // Reverse the transformations
+    x: transformed.offsetX - 100,
+    y: transformed.offsetY - 50
+  })
+);
+
+// Using arithmetic operations directly
+const scaleX = runaMultiply(2);
+const offsetY = runaAdd(50);
+const squareArea = runaPower(2);
+
+const worldCoords = { x: 10, y: 20 };
+const screenCoords = {
+  x: scaleX.encode(worldCoords.x),  // 20 (scaled)
+  y: offsetY.encode(worldCoords.y)  // 70 (offset)
+};
+
+const area = squareArea.encode(5);  // 25 (5²)
+const sideLength = squareArea.decode(area);  // 5 (√25)
+
+console.log('Screen coordinates:', screenCoords);
+console.log('Area from side length 5:', area);
+```
+
+### Example: String Formatting and Display Alignment
+
+Use string padding functions for consistent formatting and display:
+
+```typescript
+import { runaStringPadStart, runaStringPadEnd } from '@fimbul-works/runa';
+
+// Create formatters for different use cases
+const zeroPadNumbers = runaStringPadStart(8, '0');
+const rightAlignText = runaStringPadEnd(20, ' ');
+const formatPrice = runaStringPadStart(10, '$');
+const dottedFill = runaStringPadEnd(30, '.');
+
+// Format various data types
+const userId = zeroPadNumbers.encode('42');        // "00000042"
+const username = rightAlignText.encode('Alice');   // "Alice               "
+const price = formatPrice.encode('9.99');           // "$$$$$9.99"
+const description = dottedFill.encode('Status');   // "Status.................."
+
+// Restore original values
+const originalId = zeroPadNumbers.decode(userId);     // "42"
+const originalName = rightAlignText.decode(username); // "Alice"
+const originalPrice = formatPrice.decode(price);     // "9.99"
+const originalDesc = dottedFill.decode(description); // "Status"
+
+console.log('User ID:', userId);
+console.log('Formatted name:', username);
+console.log('Price:', price);
+console.log('Description:', description);
+
+// Perfect for table formatting
+const data = [
+  { id: '1', name: 'Alice', score: 95 },
+  { id: '23', name: 'Bob', score: 87 },
+  { id: '456', name: 'Charlie', score: 92 }
+];
+
+const formatRow = (item: typeof data[0]) => {
+  const id = zeroPadNumbers.encode(item.id);
+  const name = rightAlignText.encode(item.name);
+  const score = runaStringPadStart(3, '0').encode(item.score.toString());
+  return `${id} | ${name} | ${score}`;
+};
+
+data.forEach(item => {
+  console.log(formatRow(item));
+});
+// Output:
+// 00000001 | Alice               | 095
+// 00000023 | Bob                 | 087
+// 00000456 | Charlie             | 092
 ```
 
 ## Custom Transformations

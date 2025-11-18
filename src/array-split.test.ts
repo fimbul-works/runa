@@ -11,13 +11,21 @@ describe("runaArraySplit", () => {
   describe("Basic functionality", () => {
     it("should split array into chunks", () => {
       const input = ["a", "b", "c", "d", "e", "f", "g", "h", "i"];
-      const expected = [["a", "b", "c"], ["d", "e", "f"], ["g", "h", "i"]];
+      const expected = [
+        ["a", "b", "c"],
+        ["d", "e", "f"],
+        ["g", "h", "i"],
+      ];
       const result = arraySplit.encode(input);
       expect(result).toEqual(expected);
     });
 
     it("should join chunked arrays back to flat array", () => {
-      const input = [["a", "b", "c"], ["d", "e", "f"], ["g", "h", "i"]];
+      const input = [
+        ["a", "b", "c"],
+        ["d", "e", "f"],
+        ["g", "h", "i"],
+      ];
       const expected = ["a", "b", "c", "d", "e", "f", "g", "h", "i"];
       const result = arraySplit.decode(input);
       expect(result).toEqual(expected);
@@ -46,14 +54,21 @@ describe("runaArraySplit", () => {
 
     it("should handle array exactly divisible by chunk size", () => {
       const input = ["a", "b", "c", "d", "e", "f"];
-      const expected = [["a", "b", "c"], ["d", "e", "f"]];
+      const expected = [
+        ["a", "b", "c"],
+        ["d", "e", "f"],
+      ];
       const result = arraySplit.encode(input);
       expect(result).toEqual(expected);
     });
 
     it("should handle array not exactly divisible by chunk size", () => {
       const input = ["a", "b", "c", "d", "e", "f", "g", "h"];
-      const expected = [["a", "b", "c"], ["d", "e", "f"], ["g", "h"]];
+      const expected = [
+        ["a", "b", "c"],
+        ["d", "e", "f"],
+        ["g", "h"],
+      ];
       const result = arraySplit.encode(input);
       expect(result).toEqual(expected);
     });
@@ -154,9 +169,15 @@ describe("runaArraySplit", () => {
 
   describe("Error handling", () => {
     it("should throw on invalid chunk size", () => {
-      expect(() => runaArraySplit(0)).toThrow("Chunk size must be a positive integer");
-      expect(() => runaArraySplit(-1)).toThrow("Chunk size must be a positive integer");
-      expect(() => runaArraySplit(-5)).toThrow("Chunk size must be a positive integer");
+      expect(() => runaArraySplit(0)).toThrow(
+        "Chunk size must be a positive integer",
+      );
+      expect(() => runaArraySplit(-1)).toThrow(
+        "Chunk size must be a positive integer",
+      );
+      expect(() => runaArraySplit(-5)).toThrow(
+        "Chunk size must be a positive integer",
+      );
     });
 
     it("should throw on null input for encode", () => {
@@ -164,11 +185,15 @@ describe("runaArraySplit", () => {
     });
 
     it("should throw on undefined input for encode", () => {
-      expect(() => arraySplit.encode(undefined as any)).toThrow("Invalid array");
+      expect(() => arraySplit.encode(undefined as any)).toThrow(
+        "Invalid array",
+      );
     });
 
     it("should throw on non-array input for encode", () => {
-      expect(() => arraySplit.encode("not an array" as any)).toThrow("Invalid array");
+      expect(() => arraySplit.encode("not an array" as any)).toThrow(
+        "Invalid array",
+      );
       expect(() => arraySplit.encode(123 as any)).toThrow("Invalid array");
       expect(() => arraySplit.encode({} as any)).toThrow("Invalid array");
     });
@@ -178,11 +203,15 @@ describe("runaArraySplit", () => {
     });
 
     it("should throw on undefined input for decode", () => {
-      expect(() => arraySplit.decode(undefined as any)).toThrow("Invalid array");
+      expect(() => arraySplit.decode(undefined as any)).toThrow(
+        "Invalid array",
+      );
     });
 
     it("should throw on non-array input for decode", () => {
-      expect(() => arraySplit.decode("not an array" as any)).toThrow("Invalid array");
+      expect(() => arraySplit.decode("not an array" as any)).toThrow(
+        "Invalid array",
+      );
       expect(() => arraySplit.decode(123 as any)).toThrow("Invalid array");
       expect(() => arraySplit.decode({} as any)).toThrow("Invalid array");
     });
@@ -193,8 +222,13 @@ describe("runaArraySplit", () => {
     });
 
     it("should throw on chunks that exceed size limit", () => {
-      const input = [["a", "b", "c"], ["d", "e", "f", "g"]]; // Second chunk has 4 elements, limit is 3
-      expect(() => arraySplit.decode(input)).toThrow("Array length exceeds chunkSize");
+      const input = [
+        ["a", "b", "c"],
+        ["d", "e", "f", "g"],
+      ]; // Second chunk has 4 elements, limit is 3
+      expect(() => arraySplit.decode(input)).toThrow(
+        "Array length exceeds chunkSize",
+      );
     });
 
     it("should handle chunks that are smaller than the limit", () => {
@@ -227,7 +261,9 @@ describe("runaArraySplit", () => {
     });
 
     it("should handle sparse arrays", () => {
-      const original = Array.from({ length: 10 }, (_, i) => i === 5 ? undefined : i);
+      const original = Array.from({ length: 10 }, (_, i) =>
+        i === 5 ? undefined : i,
+      );
       const chunked = arraySplit.encode(original as any);
       const restored = arraySplit.decode(chunked);
       expect(restored).toEqual(original);
@@ -261,7 +297,10 @@ describe("runaArraySplit", () => {
     });
 
     it("should handle deeply nested structures efficiently", () => {
-      const deepArray = Array.from({ length: 100 }, (_, i) => ({ id: i, data: `item${i}` }));
+      const deepArray = Array.from({ length: 100 }, (_, i) => ({
+        id: i,
+        data: `item${i}`,
+      }));
       const objectSplit = runaArraySplit<any>(5);
       const start = performance.now();
       const chunked = objectSplit.encode(deepArray);
@@ -310,11 +349,7 @@ describe("runaArraySplit", () => {
       }
 
       const identifiableSplit = runaArraySplit<Identifiable>(1);
-      const original: Identifiable[] = [
-        { id: "a" },
-        { id: "b" },
-        { id: "c" },
-      ];
+      const original: Identifiable[] = [{ id: "a" }, { id: "b" }, { id: "c" }];
 
       const chunked = identifiableSplit.encode(original);
       const restored = identifiableSplit.decode(chunked);
