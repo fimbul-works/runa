@@ -2,9 +2,9 @@
 
 # @fimbul-works/runa
 
-*Runa (ᚱᚢᚾᚨ)* is a TypeScript library for creating elegant, bidirectional, and type-safe data transformations.
+Runa is a TypeScript library for creating elegant, bidirectional, and type-safe data transformations.
 
-At its core, a **Runa** is a composable object with two fundamental methods: `encode` and `decode`. This design ensures that your data transformations are always reversible and perfectly type-safe, whether you're working with synchronous or asynchronous operations.
+At its core, a *Runa* is a composable object with two fundamental methods: `encode` and `decode`. This design ensures that your data transformations are always reversible and perfectly type-safe, whether you're working with synchronous or asynchronous operations.
 
 ## Key Features
 
@@ -20,7 +20,7 @@ npm install @fimbul-works/runa
 # or
 yarn add @fimbul-works/runa
 # or
-pnpm add @fimbul-works/runa
+pnpm install @fimbul-works/runa
 ```
 
 ## Basic Usage
@@ -30,13 +30,13 @@ Start by creating a simple bidirectional transformation using `createRuna`.
 ```typescript
 import { createRuna } from '@fimbul-works/runa';
 
-const hex = createRuna(
+const numberToHex = createRuna(
   (n: number) => n.toString(16),
   (s: string) => parseInt(s, 16)
 );
 
-hex.encode(255) // "ff"
-hex.decode("ff") // 255
+numberToHex.encode(255) // "ff"
+numberToHex.decode("ff") // 255
 ```
 
 ## Chaining: String to Buffer to Array
@@ -44,39 +44,27 @@ hex.decode("ff") // 255
 One of the features of Runa is the ability to chain multiple transformations. Here's an example that converts a string to a buffer, and then converts the buffer to an array:
 
 ```typescript
-import { createRuna } from '@fimbul-works/runa';
+import { runaStringToBuffer, runaBufferToArray } from '@fimbul-works/runa';
 
 // 1. Create a string to buffer converter
-const stringToBuffer = createRuna(
-  (str: string) => Buffer.from(str, 'utf8'), // encode: string to buffer
-  (buf: Buffer) => buf.toString('utf8'),     // decode: buffer to string
-);
+const stringToBuffer = runaStringToBuffer();
 
 // 2. Create a buffer to array converter
-const bufferToArray = createRuna(
-  (buf: Buffer) => Array.from(buf),          // encode: buffer to array
-  (arr: number[]) => Buffer.from(arr),       // decode: array to buffer
-);
+const bufferToArray = runaBufferToArray();
 
 // 3. Chain them together to create a string to array converter
 const stringToArray = stringToBuffer.chain(bufferToArray);
 
 // Use the chained converter
 const originalString = "Hello, Runa!";
-const array = stringToArray.encode(originalString); // => [72, 101, 108, 108, 111, 44, 32, 82, 117, 110, 97, 33]
-const reconstructedString = stringToArray.decode(array); // => "Hello, Runa!"
+const array = stringToArray.encode(originalString);
+const reconstructedString = stringToArray.decode(array);
 
 console.log(array); // [72, 101, 108, 108, 111, 44, 32, 82, 117, 110, 97, 33]
 console.log(reconstructedString); // "Hello, Runa!"
 ```
 
 This example demonstrates how Runa enables you to build complex transformation pipelines while maintaining type safety and bidirectional transformations at each step.
-
-### More Examples
-
-For comprehensive, executable examples demonstrating real-world use cases, see the **[./examples](./examples)** directory:
-
----
 
 ## Available Converters
 

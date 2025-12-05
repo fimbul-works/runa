@@ -1,7 +1,7 @@
 {
   "name": "@fimbul-works/runa",
-  "description": "Rúna is a collection of utilities to perform bidirectional transformations.",
-  "version": "0.2.0",
+  "description": "Runa is a TypeScript library for creating elegant, bidirectional, and type-safe data transformations",
+  "version": "0.3.0",
   "type": "module",
   "private": false,
   "license": "MIT",
@@ -114,6 +114,11 @@
       "import": "./dist/esm/string-pad.js",
       "require": "./dist/cjs/string-pad.js"
     },
+    "./string-split": {
+      "types": "./dist/esm/string-split.d.ts",
+      "import": "./dist/esm/string-split.js",
+      "require": "./dist/cjs/string-split.js"
+    },
     "./string-to-buffer": {
       "types": "./dist/esm/string-to-buffer.d.ts",
       "import": "./dist/esm/string-to-buffer.js",
@@ -130,7 +135,11 @@
       "require": "./dist/cjs/uri.js"
     }
   },
-  "files": ["dist", "README.md", "LICENSE"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "sideEffects": false,
   "scripts": {
     "build": "rm -rf dist && pnpm build:esm && pnpm build:cjs",
@@ -141,13 +150,13 @@
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.5",
+    "@biomejs/biome": "^2.3.8",
     "@types/node": "^24.10.1",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.9"
+    "vitest": "^4.0.15"
   },
   "dependencies": {
     "ff1-js": "^1.0.2",
-    "superjson": "^2.2.5"
+    "superjson": "^2.2.6"
   }
 }
